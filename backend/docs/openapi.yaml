@@ -1,0 +1,498 @@
+openapi: 3.0.3
+info:
+  title: Pharmaceutical Corporate Website API
+  version: 1.0.0
+  description: |
+    REST API for the corporate website and admin CMS.
+
+    **Conventions**
+    - All responses use `{ success, message, data, meta? }`.
+    - Public GET endpoints return only published/open/active records.
+    - Admin endpoints require a Bearer JWT **or** the `access_token` HttpOnly cookie set by `/auth/login`.
+    - Roles: `superadmin` (everything incl. users), `admin` (content + enquiries/applications/settings), `editor` (content & media only).
+    - Content collections (`products`, `categories`, `capabilities`, `certifications`, `facilities`,
+      `leadership`, `news`, `gallery`, `careers`) share the same CRUD shape described under *Generic content collection*.
+servers:
+  - url: http://localhost:5000/api/v1
+tags:
+  - name: Auth
+  - name: Products
+  - name: Categories
+  - name: Content
+  - name: Careers
+  - name: Public Forms
+  - name: Admin
+security:
+  - bearerAuth: []
+  - cookieAuth: []
+components:
+  securitySchemes:
+    bearerAuth: { type: http, scheme: bearer, bearerFormat: JWT }
+    cookieAuth: { type: apiKey, in: cookie, name: access_token }
+  parameters:
+    page: { name: page, in: query, schema: { type: integer, minimum: 1, default: 1 } }
+    limit: { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 100 } }
+    search: { name: search, in: query, schema: { type: string } }
+    sort: { name: sort, in: query, schema: { type: string } }
+    order: { name: order, in: query, schema: { type: string, enum: [asc, desc] } }
+    includeAll:
+      name: includeAll
+      in: query
+      description: Admin only — include drafts/archived.
+      schema: { type: boolean }
+    status: { name: status, in: query, schema: { type: string } }
+    id: { name: id, in: path, required: true, schema: { type: string, pattern: '^[0-9a-fA-F]{24}$' } }
+    identifier: { name: identifier, in: path, required: true, description: Slug or ObjectId, schema: { type: string } }
+  schemas:
+    Envelope:
+      type: object
+      properties:
+        success: { type: boolean }
+        message: { type: string }
+        data: {}
+        meta:
+          type: object
+          properties:
+            page: { type: integer }
+            limit: { type: integer }
+            total: { type: integer }
+            totalPages: { type: integer }
+    Error:
+      type: object
+      properties:
+        success: { type: boolean, example: false }
+        message: { type: string }
+        errors:
+          type: array
+          items:
+            type: object
+            properties: { field: { type: string }, message: { type: string } }
+    Image:
+      type: object
+      properties: { url: { type: string }, alt: { type: string }, mediaId: { type: string } }
+    Document:
+      type: object
+      properties: { title: { type: string }, url: { type: string }, mediaId: { type: string } }
+    Seo:
+      type: object
+      properties:
+        title: { type: string, maxLength: 70 }
+        description: { type: string, maxLength: 160 }
+        keywords: { type: array, items: { type: string } }
+        canonicalUrl: { type: string }
+        ogImage: { type: string }
+        noIndex: { type: boolean }
+    StatusBody:
+      type: object
+      required: [status]
+      properties: { status: { type: string } }
+    Product:
+      type: object
+      required: [name, categoryId]
+      properties:
+        name: { type: string }
+        slug: { type: string }
+        productCode: { type: string }
+        casNumber: { type: string, example: '50-78-2' }
+        categoryId: { type: string }
+        therapeuticArea: { type: string }
+        shortDescription: { type: string }
+        description: { type: string, description: Sanitised HTML }
+        applications: { type: array, items: { type: string } }
+        technicalInformation:
+          type: object
+          properties:
+            molecularFormula: { type: string }
+            molecularWeight: { type: string }
+            grade: { type: string }
+            storageConditions: { type: string }
+            packaging: { type: string }
+            shelfLife: { type: string }
+            purity: { type: string }
+            appearance: { type: string }
+        image: { $ref: '#/components/schemas/Image' }
+        gallery: { type: array, items: { $ref: '#/components/schemas/Image' } }
+        documents: { type: array, items: { $ref: '#/components/schemas/Document' } }
+        seo: { $ref: '#/components/schemas/Seo' }
+        featured: { type: boolean }
+        sortOrder: { type: integer }
+        status: { type: string, enum: [draft, published, archived] }
+    Category:
+      type: object
+      required: [name]
+      properties:
+        name: { type: string }
+        slug: { type: string }
+        description: { type: string }
+        image: { $ref: '#/components/schemas/Image' }
+        sortOrder: { type: integer }
+        status: { type: string, enum: [active, inactive] }
+        seo: { $ref: '#/components/schemas/Seo' }
+    Job:
+      type: object
+      required: [title]
+      properties:
+        title: { type: string }
+        slug: { type: string }
+        department: { type: string }
+        location: { type: string }
+        employmentType: { type: string, enum: [Full-time, Part-time, Contract, Internship] }
+        experience: { type: string }
+        qualification: { type: string }
+        description: { type: string }
+        responsibilities: { type: array, items: { type: string } }
+        requirements: { type: array, items: { type: string } }
+        status: { type: string, enum: [draft, open, closed, archived] }
+        closingDate: { type: string, format: date-time, nullable: true }
+        seo: { $ref: '#/components/schemas/Seo' }
+    Enquiry:
+      type: object
+      required: [name, email, message, consent]
+      properties:
+        type: { type: string, enum: [product, general, partnership, career], default: general }
+        name: { type: string }
+        company: { type: string, description: Required when type=product }
+        email: { type: string, format: email }
+        phone: { type: string }
+        country: { type: string }
+        subject: { type: string }
+        productId: { type: string, description: Required when type=product }
+        quantity: { type: string }
+        message: { type: string }
+        consent: { type: boolean, enum: [true] }
+        sourcePage: { type: string }
+        captchaToken: { type: string }
+  responses:
+    OK: { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/Envelope' } } } }
+    Created: { description: Created, content: { application/json: { schema: { $ref: '#/components/schemas/Envelope' } } } }
+    NoContent: { description: Deleted }
+    BadRequest: { description: Validation error, content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+    Unauthorized: { description: Not authenticated, content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+    Forbidden: { description: Insufficient role, content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+    NotFound: { description: Not found, content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+    Conflict: { description: Conflict (e.g. category in use), content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+
+paths:
+  /health:
+    get: { tags: [Auth], security: [], summary: Health check, responses: { '200': { $ref: '#/components/responses/OK' } } }
+
+  # ---------------- Auth ----------------
+  /auth/login:
+    post:
+      tags: [Auth]
+      security: []
+      summary: Admin login (rate limited 10/15min). Sets HttpOnly cookies and returns tokens.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties: { email: { type: string, format: email }, password: { type: string } }
+      responses:
+        '200': { $ref: '#/components/responses/OK' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /auth/refresh:
+    post: { tags: [Auth], security: [], summary: Rotate access token using refresh cookie/body, responses: { '200': { $ref: '#/components/responses/OK' } } }
+  /auth/logout:
+    post: { tags: [Auth], summary: Logout and invalidate all sessions of the user, responses: { '200': { $ref: '#/components/responses/OK' } } }
+  /auth/me:
+    get: { tags: [Auth], summary: Current user, responses: { '200': { $ref: '#/components/responses/OK' }, '401': { $ref: '#/components/responses/Unauthorized' } } }
+  /auth/change-password:
+    patch:
+      tags: [Auth]
+      summary: Change own password (invalidates other sessions)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [currentPassword, newPassword]
+              properties: { currentPassword: { type: string }, newPassword: { type: string, minLength: 10 } }
+      responses: { '200': { $ref: '#/components/responses/OK' } }
+
+  # ---------------- Products ----------------
+  /products:
+    get:
+      tags: [Products]
+      security: []
+      summary: List products (public = published only)
+      parameters:
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/search'
+        - { name: category, in: query, description: Category slug or id, schema: { type: string } }
+        - { name: therapeuticArea, in: query, schema: { type: string } }
+        - { name: featured, in: query, schema: { type: boolean } }
+        - { name: sort, in: query, schema: { type: string, enum: [name, productCode, createdAt, sortOrder] } }
+        - $ref: '#/components/parameters/order'
+        - $ref: '#/components/parameters/includeAll'
+        - $ref: '#/components/parameters/status'
+      responses: { '200': { $ref: '#/components/responses/OK' } }
+    post:
+      tags: [Products]
+      summary: Create product (content roles)
+      requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/Product' } } } }
+      responses:
+        '201': { $ref: '#/components/responses/Created' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /products/featured:
+    get:
+      tags: [Products]
+      security: []
+      parameters: [{ name: limit, in: query, schema: { type: integer, default: 8 } }]
+      responses: { '200': { $ref: '#/components/responses/OK' } }
+  /products/therapeutic-areas:
+    get: { tags: [Products], security: [], summary: Distinct therapeutic areas of published products, responses: { '200': { $ref: '#/components/responses/OK' } } }
+  /products/related/{id}:
+    get:
+      tags: [Products]
+      security: []
+      parameters: [{ $ref: '#/components/parameters/id' }]
+      responses: { '200': { $ref: '#/components/responses/OK' } }
+  /products/{slug}:
+    get:
+      tags: [Products]
+      security: []
+      summary: Product detail by slug (or id). Old slugs return `data.redirectTo`.
+      parameters: [{ name: slug, in: path, required: true, schema: { type: string } }]
+      responses: { '200': { $ref: '#/components/responses/OK' }, '404': { $ref: '#/components/responses/NotFound' } }
+  /products/{id}:
+    put:
+      tags: [Products]
+      parameters: [{ $ref: '#/components/parameters/id' }]
+      requestBody: { content: { application/json: { schema: { $ref: '#/components/schemas/Product' } } } }
+      responses: { '200': { $ref: '#/components/responses/OK' } }
+    delete:
+      tags: [Products]
+      parameters: [{ $ref: '#/components/parameters/id' }]
+      responses: { '204': { $ref: '#/components/responses/NoContent' } }
+  /products/{id}/status:
+    patch:
+      tags: [Products]
+      summary: Publish / unpublish / archive. Publishing requires a description.
+      parameters: [{ $ref: '#/components/parameters/id' }]
+      requestBody: { content: { application/json: { schema: { $ref: '#/components/schemas/StatusBody' } } } }
+      responses: { '200': { $ref: '#/components/responses/OK' }, '400': { $ref: '#/components/responses/BadRequest' } }
+
+  # ---------------- Categories ----------------
+  /categories:
+    get:
+      tags: [Categories]
+      security: []
+      parameters: [{ $ref: '#/components/parameters/page' }, { $ref: '#/components/parameters/limit' }, { $ref: '#/components/parameters/search' }, { $ref: '#/components/parameters/includeAll' }]
+      responses: { '200': { $ref: '#/components/responses/OK' } }
+    post:
+      tags: [Categories]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/Category' } } } }
+      responses: { '201': { $ref: '#/components/responses/Created' } }
+  /categories/{identifier}:
+    get:
+      tags: [Categories]
+      security: []
+      parameters: [{ $ref: '#/components/parameters/identifier' }]
+      responses: { '200': { $ref: '#/components/responses/OK' } }
+  /categories/{id}:
+    put:
+      tags: [Categories]
+      parameters: [{ $ref: '#/components/parameters/id' }]
+      requestBody: { content: { application/json: { schema: { $ref: '#/components/schemas/Category' } } } }
+      responses: { '200': { $ref: '#/components/responses/OK' } }
+    delete:
+      tags: [Categories]
+      summary: Delete category (409 if products still reference it)
+      parameters: [{ $ref: '#/components/parameters/id' }]
+      responses: { '204': { $ref: '#/components/responses/NoContent' }, '409': { $ref: '#/components/responses/Conflict' } }
+  /categories/{id}/status:
+    patch:
+      tags: [Categories]
+      parameters: [{ $ref: '#/components/parameters/id' }]
+      requestBody: { content: { application/json: { schema: { type: object, properties: { status: { type: string, enum: [active, inactive] } } } } } }
+      responses: { '200': { $ref: '#/components/responses/OK' } }
+
+  # ---------------- Generic content collections ----------------
+  /{collection}:
+    parameters:
+      - name: collection
+        in: path
+        required: true
+        schema: { type: string, enum: [capabilities, certifications, facilities, leadership, news, gallery, careers] }
+    get:
+      tags: [Content]
+      security: []
+      summary: List (public = published / open)
+      parameters: [{ $ref: '#/components/parameters/page' }, { $ref: '#/components/parameters/limit' }, { $ref: '#/components/parameters/search' }, { $ref: '#/components/parameters/sort' }, { $ref: '#/components/parameters/order' }, { $ref: '#/components/parameters/includeAll' }, { $ref: '#/components/parameters/status' }]
+      responses: { '200': { $ref: '#/components/responses/OK' } }
+    post:
+      tags: [Content]
+      summary: Create (content roles)
+      requestBody: { content: { application/json: { schema: { type: object } } } }
+      responses: { '201': { $ref: '#/components/responses/Created' } }
+  /{collection}/{identifier}:
+    parameters:
+      - { name: collection, in: path, required: true, schema: { type: string } }
+      - $ref: '#/components/parameters/identifier'
+    get: { tags: [Content], security: [], summary: Detail by slug or id, responses: { '200': { $ref: '#/components/responses/OK' }, '404': { $ref: '#/components/responses/NotFound' } } }
+    put:
+      tags: [Content]
+      requestBody: { content: { application/json: { schema: { type: object } } } }
+      responses: { '200': { $ref: '#/components/responses/OK' } }
+    delete: { tags: [Content], responses: { '204': { $ref: '#/components/responses/NoContent' } } }
+  /{collection}/{id}/status:
+    parameters:
+      - { name: collection, in: path, required: true, schema: { type: string } }
+      - $ref: '#/components/parameters/id'
+    patch:
+      tags: [Content]
+      summary: Change status (draft/published/archived; careers use draft/open/closed/archived)
+      requestBody: { content: { application/json: { schema: { $ref: '#/components/schemas/StatusBody' } } } }
+      responses: { '200': { $ref: '#/components/responses/OK' } }
+
+  # ---------------- Careers / applications ----------------
+  /careers/{id}/applications:
+    post:
+      tags: [Careers]
+      security: []
+      summary: Apply for an open vacancy (multipart, resume PDF/DOC/DOCX ≤ MAX_UPLOAD_MB). Rate limited.
+      parameters: [{ $ref: '#/components/parameters/id' }]
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [name, email, consent, resume]
+              properties:
+                name: { type: string }
+                email: { type: string, format: email }
+                phone: { type: string }
+                qualification: { type: string }
+                experience: { type: string }
+                coverLetter: { type: string }
+                consent: { type: boolean }
+                captchaToken: { type: string }
+                resume: { type: string, format: binary }
+      responses: { '201': { $ref: '#/components/responses/Created' }, '400': { $ref: '#/components/responses/BadRequest' } }
+  /admin/applications:
+    get:
+      tags: [Admin]
+      summary: List applications (admin/superadmin)
+      parameters: [{ $ref: '#/components/parameters/page' }, { $ref: '#/components/parameters/limit' }, { $ref: '#/components/parameters/search' }, { $ref: '#/components/parameters/status' }, { name: jobId, in: query, schema: { type: string } }]
+      responses: { '200': { $ref: '#/components/responses/OK' } }
+  /admin/applications/{id}:
+    get: { tags: [Admin], parameters: [{ $ref: '#/components/parameters/id' }], responses: { '200': { $ref: '#/components/responses/OK' } } }
+    delete: { tags: [Admin], parameters: [{ $ref: '#/components/parameters/id' }], responses: { '204': { $ref: '#/components/responses/NoContent' } } }
+  /admin/applications/{id}/resume:
+    get: { tags: [Admin], summary: Download private resume, parameters: [{ $ref: '#/components/parameters/id' }], responses: { '200': { description: File stream } } }
+  /admin/applications/{id}/status:
+    patch:
+      tags: [Admin]
+      parameters: [{ $ref: '#/components/parameters/id' }]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status: { type: string, enum: [received, in_review, shortlisted, interview, rejected, hired, archived] }
+                notes: { type: string }
+      responses: { '200': { $ref: '#/components/responses/OK' } }
+
+  # ---------------- Public forms ----------------
+  /enquiries:
+    post:
+      tags: [Public Forms]
+      security: []
+      summary: Submit a product/general/partnership enquiry (rate limited, honeypot `website`)
+      requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/Enquiry' } } } }
+      responses: { '201': { $ref: '#/components/responses/Created' }, '400': { $ref: '#/components/responses/BadRequest' } }
+  /contact:
+    post:
+      tags: [Public Forms]
+      security: []
+      summary: General contact form (stored as enquiry type=general)
+      requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/Enquiry' } } } }
+      responses: { '201': { $ref: '#/components/responses/Created' } }
+  /admin/enquiries:
+    get:
+      tags: [Admin]
+      parameters: [{ $ref: '#/components/parameters/page' }, { $ref: '#/components/parameters/limit' }, { $ref: '#/components/parameters/search' }, { $ref: '#/components/parameters/status' }, { name: type, in: query, schema: { type: string } }]
+      responses: { '200': { $ref: '#/components/responses/OK' } }
+  /admin/enquiries/{id}:
+    get: { tags: [Admin], parameters: [{ $ref: '#/components/parameters/id' }], responses: { '200': { $ref: '#/components/responses/OK' } } }
+    delete: { tags: [Admin], parameters: [{ $ref: '#/components/parameters/id' }], responses: { '204': { $ref: '#/components/responses/NoContent' } } }
+  /admin/enquiries/{id}/status:
+    patch:
+      tags: [Admin]
+      parameters: [{ $ref: '#/components/parameters/id' }]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties: { status: { type: string, enum: [new, in_progress, responded, closed, spam] }, notes: { type: string } }
+      responses: { '200': { $ref: '#/components/responses/OK' } }
+
+  # ---------------- Pages ----------------
+  /pages/{slug}:
+    get:
+      tags: [Content]
+      security: []
+      summary: Published page by slug (home, about, quality, privacy-policy, terms, custom)
+      parameters: [{ name: slug, in: path, required: true, schema: { type: string } }]
+      responses: { '200': { $ref: '#/components/responses/OK' }, '404': { $ref: '#/components/responses/NotFound' } }
+  /admin/pages:
+    get: { tags: [Admin], responses: { '200': { $ref: '#/components/responses/OK' } } }
+    post:
+      tags: [Admin]
+      requestBody: { content: { application/json: { schema: { type: object, required: [title], properties: { title: { type: string }, slug: { type: string }, sections: { type: array, items: { type: object } }, seo: { $ref: '#/components/schemas/Seo' }, status: { type: string } } } } } }
+      responses: { '201': { $ref: '#/components/responses/Created' } }
+  /admin/pages/{id}:
+    get: { tags: [Admin], parameters: [{ $ref: '#/components/parameters/id' }], responses: { '200': { $ref: '#/components/responses/OK' } } }
+    put: { tags: [Admin], parameters: [{ $ref: '#/components/parameters/id' }], requestBody: { content: { application/json: { schema: { type: object } } } }, responses: { '200': { $ref: '#/components/responses/OK' } } }
+    delete: { tags: [Admin], summary: Delete custom page (system pages are protected), parameters: [{ $ref: '#/components/parameters/id' }], responses: { '204': { $ref: '#/components/responses/NoContent' }, '403': { $ref: '#/components/responses/Forbidden' } } }
+  /admin/pages/{id}/publish:
+    patch: { tags: [Admin], parameters: [{ $ref: '#/components/parameters/id' }], requestBody: { content: { application/json: { schema: { $ref: '#/components/schemas/StatusBody' } } } }, responses: { '200': { $ref: '#/components/responses/OK' } } }
+
+  # ---------------- Settings / media / users / dashboard ----------------
+  /settings/public:
+    get: { tags: [Content], security: [], summary: Public site settings (company, contact, social, seo, analytics), responses: { '200': { $ref: '#/components/responses/OK' } } }
+  /admin/settings:
+    get: { tags: [Admin], responses: { '200': { $ref: '#/components/responses/OK' } } }
+    put: { tags: [Admin], requestBody: { content: { application/json: { schema: { type: object } } } }, responses: { '200': { $ref: '#/components/responses/OK' } } }
+  /admin/media/upload:
+    post:
+      tags: [Admin]
+      summary: Upload up to 5 public files (JPG/PNG/WebP/PDF). Content roles.
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                files: { type: array, items: { type: string, format: binary } }
+                folder: { type: string, enum: [products, categories, gallery, news, certificates, facilities, leadership, pages, documents, misc] }
+                alt: { type: string }
+      responses: { '201': { $ref: '#/components/responses/Created' } }
+  /admin/media:
+    get:
+      tags: [Admin]
+      parameters: [{ $ref: '#/components/parameters/page' }, { $ref: '#/components/parameters/limit' }, { name: kind, in: query, schema: { type: string, enum: [image, document] } }, { name: folder, in: query, schema: { type: string } }, { $ref: '#/components/parameters/search' }]
+      responses: { '200': { $ref: '#/components/responses/OK' } }
+  /admin/media/{id}:
+    patch: { tags: [Admin], summary: Update alt text, parameters: [{ $ref: '#/components/parameters/id' }], requestBody: { content: { application/json: { schema: { type: object, properties: { alt: { type: string } } } } } }, responses: { '200': { $ref: '#/components/responses/OK' } } }
+    delete: { tags: [Admin], parameters: [{ $ref: '#/components/parameters/id' }], responses: { '204': { $ref: '#/components/responses/NoContent' } } }
+  /admin/users:
+    get: { tags: [Admin], summary: List admin users (superadmin), responses: { '200': { $ref: '#/components/responses/OK' } } }
+    post:
+      tags: [Admin]
+      summary: Create admin/editor (superadmin)
+      requestBody: { content: { application/json: { schema: { type: object, required: [name, email, password, role], properties: { name: { type: string }, email: { type: string }, password: { type: string }, role: { type: string, enum: [superadmin, admin, editor] } } } } } }
+      responses: { '201': { $ref: '#/components/responses/Created' } }
+  /admin/users/{id}:
+    put: { tags: [Admin], parameters: [{ $ref: '#/components/parameters/id' }], requestBody: { content: { application/json: { schema: { type: object, properties: { name: { type: string }, role: { type: string }, isActive: { type: boolean }, password: { type: string } } } } } }, responses: { '200': { $ref: '#/components/responses/OK' } } }
+    delete: { tags: [Admin], parameters: [{ $ref: '#/components/parameters/id' }], responses: { '204': { $ref: '#/components/responses/NoContent' } } }
+  /admin/dashboard/stats:
+    get: { tags: [Admin], summary: Dashboard counters and recent activity, responses: { '200': { $ref: '#/components/responses/OK' } } }
