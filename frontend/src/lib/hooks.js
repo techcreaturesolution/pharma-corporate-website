@@ -16,4 +16,4 @@ export const useSettings = () => useApi('/settings/public', undefined, { staleTi
 export const usePage = (slug) => useApi(`/pages/${slug}`);
 
 export const formatDate = (value, opts = { year: 'numeric', month: 'short', day: 'numeric' }) =>
-  value ? new Date(value).toLocaleDateString(undefined, opts) : '';
+  value ? new Date(value).toLocaleString(undefined, opts) : '';

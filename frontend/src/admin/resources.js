@@ -19,7 +19,7 @@ export const RESOURCES = {
       { key: 'name', label: 'Name' },
       { key: 'productCode', label: 'Code' },
       { key: 'casNumber', label: 'CAS' },
-      { key: 'categoryId.name', label: 'Category' },
+      { key: 'category.name', label: 'Category' },
       { key: 'featured', label: 'Featured', type: 'bool' },
       { key: 'status', label: 'Status', type: 'status' },
     ],
