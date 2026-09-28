@@ -39,7 +39,7 @@ export default function ProductDetail() {
   const images = [product.image, ...(product.gallery || [])].filter((i) => i?.url);
   const current = active || images[0];
   const tech = Object.entries(product.technicalInformation || {}).filter(([, v]) => v);
-  const category = product.categoryId;
+  const category = product.category;
 
   return (
     <>

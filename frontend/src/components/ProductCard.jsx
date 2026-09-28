@@ -15,7 +15,7 @@ export default function ProductCard({ product }) {
         <h3>
           <Link to={`/products/${product.slug}`}>{product.name}</Link>
         </h3>
-        {product.categoryId?.name && <span className="badge">{product.categoryId.name}</span>}
+        {product.category?.name && <span className="badge">{product.category.name}</span>}
         {product.shortDescription && <p className="meta">{product.shortDescription}</p>}
         <Link to={`/products/${product.slug}`} className="link">
           View details <Icon name="arrow" />
