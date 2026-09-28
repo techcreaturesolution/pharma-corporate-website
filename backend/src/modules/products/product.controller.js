@@ -28,7 +28,8 @@ export const detail = async (req, res) => {
     return sendSuccess(res, { message: 'Product retrieved successfully', data: product });
   } catch (err) {
     if (err.redirectTo) {
-      return res.status(301).json({ success: false, message: err.message, redirectTo: err.redirectTo });
+      // Browsers follow real 3xx on XHR transparently (to the API URL), so signal the move in-band.
+      return res.status(200).json({ success: true, message: err.message, data: { redirectTo: err.redirectTo } });
     }
     throw err;
   }
