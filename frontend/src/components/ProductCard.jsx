@@ -4,23 +4,13 @@ import { Icon, Img } from './ui.jsx';
 export default function ProductCard({ product }) {
   return (
     <article className="card product-card">
-      <Link to={`/products/${product.slug}`} aria-label={product.name}>
+      <Link to={`/products/${product.slug}`} style={{ display: 'flex', flexDirection: 'column', height: '100%', textDecoration: 'none', color: 'inherit' }}>
         <Img image={product.image} alt={product.name} />
-      </Link>
-      <div className="product-card__body">
-        <div className="product-card__meta">
-          {product.productCode && <span>Code: {product.productCode}</span>}
-          {product.casNumber && <span>CAS: {product.casNumber}</span>}
+        <div className="product-card__body">
+          <h3>{product.name}</h3>
+          {product.shortDescription && <p className="meta" style={{ margin: 0 }}>{product.shortDescription}</p>}
         </div>
-        <h3>
-          <Link to={`/products/${product.slug}`}>{product.name}</Link>
-        </h3>
-        {product.category?.name && <span className="badge">{product.category.name}</span>}
-        {product.shortDescription && <p className="meta">{product.shortDescription}</p>}
-        <Link to={`/products/${product.slug}`} className="link">
-          View details <Icon name="arrow" />
-        </Link>
-      </div>
+      </Link>
     </article>
   );
 }

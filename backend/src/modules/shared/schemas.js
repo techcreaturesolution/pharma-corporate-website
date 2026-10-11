@@ -41,13 +41,13 @@ export const imageJoi = Joi.object({
   url: Joi.string().uri({ allowRelative: true }).allow('').max(2000),
   alt: Joi.string().allow('').max(200),
   mediaId: objectId.allow(null, ''),
-});
+}).allow(null);
 
 export const documentJoi = Joi.object({
   title: Joi.string().allow('').max(200),
   url: Joi.string().uri({ allowRelative: true }).allow('').max(2000),
   mediaId: objectId.allow(null, ''),
-});
+}).allow(null);
 
 export const seoJoi = Joi.object({
   title: Joi.string().allow('').max(70),
@@ -56,7 +56,7 @@ export const seoJoi = Joi.object({
   canonicalUrl: Joi.string().uri().allow(''),
   ogImage: Joi.string().uri({ allowRelative: true }).allow(''),
   noIndex: Joi.boolean(),
-});
+}).allow(null);
 
 export const slugJoi = Joi.string()
   .pattern(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'slug')

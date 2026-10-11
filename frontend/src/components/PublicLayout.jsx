@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
-import { NavLink, Link, Outlet, useLocation } from 'react-router-dom';
+import { NavLink, Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { useSettings } from '../lib/hooks.js';
+import { useSettings, useApi } from '../lib/hooks.js';
 import { Icon, Img } from './ui.jsx';
+import { assetUrl } from '../lib/api.js';
 
 const NAV = [
+  { to: '/', label: 'Home' },
   { to: '/about', label: 'About' },
   { to: '/products', label: 'Products' },
   { to: '/capabilities', label: 'Capabilities' },
@@ -19,9 +21,11 @@ const NAV = [
 
 export default function PublicLayout() {
   const { data } = useSettings();
+  const categories = useApi('/categories', { limit: 100 });
   const site = data?.data || {};
   const [open, setOpen] = useState(false);
   const { pathname } = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     setOpen(false);
@@ -41,6 +45,7 @@ export default function PublicLayout() {
   return (
     <>
       <Helmet>
+        {company.favicon?.url && <link rel="icon" href={assetUrl(company.favicon.url)} />}
         {gtmId && (
           <script>{`(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','${gtmId}');`}</script>
         )}
@@ -50,39 +55,94 @@ export default function PublicLayout() {
       <a href="#main" className="skip-link">
         Skip to content
       </a>
-      <header className="site-header">
-        <div className="topbar">
-          <div className="container topbar__inner">
+      <header className="site-header" style={{ borderBottom: '1px solid #e1e7ec' }}>
+        <div className="topbar" style={{ background: '#f8fbfb', color: '#105c48' }}>
+          <div className="container topbar__inner" style={{ fontSize: '0.85rem', fontWeight: '500', gap: '2rem' }}>
             {contact.email && (
-              <a href={`mailto:${contact.email}`}>
+              <a href={`mailto:${contact.email}`} className="nav-bottom-link" style={{display: 'flex', gap: '6px', alignItems: 'center', color: 'inherit', paddingBottom: '0.2rem', textDecoration: 'none'}}>
                 <Icon name="mail" /> {contact.email}
               </a>
             )}
             {contact.phone && (
-              <a href={`tel:${contact.phone.replace(/\s/g, '')}`}>
+              <a href={`tel:${contact.phone.replace(/\s/g, '')}`} className="nav-bottom-link" style={{display: 'flex', gap: '6px', alignItems: 'center', color: 'inherit', paddingBottom: '0.2rem', textDecoration: 'none'}}>
                 <Icon name="phone" /> {contact.phone}
               </a>
             )}
-            <span className="topbar__spacer" />
-            <Link to="/contact" className="topbar__cta">
-              Request a quote
+            <span className="topbar__spacer" style={{flex: 1}} />
+            <Link to="/contact" className="topbar__cta nav-bottom-link" style={{display: 'flex', gap: '6px', alignItems: 'center', color: 'inherit', paddingBottom: '0.2rem', textDecoration: 'none'}}>
+              <Icon name="file" /> Request a quote
             </Link>
           </div>
         </div>
-        <div className="container nav__inner">
+        
+        <div className="container middlebar" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1rem 0', gap: '2rem' }}>
           <Link to="/" className="brand" aria-label={`${company.name || 'Home'} home`}>
-            {company.logo?.url ? <Img image={company.logo} className="brand__logo" /> : <span className="brand__mark">+</span>}
-            <span className="brand__text">
-              <strong>{company.name || 'Pharma Company'}</strong>
-              {company.tagline && <small>{company.tagline}</small>}
-            </span>
+            {company.logo?.url ? (
+              <Img image={company.logo} className="brand__logo" style={{ maxHeight: '48px' }} />
+            ) : (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <span className="brand__mark" style={{ background: '#105c48', color: '#fff', borderRadius: '10px', fontSize: '2rem', padding: '0.2rem 0.6rem', display: 'flex' }}>+</span>
+                <span className="brand__text">
+                  <strong style={{ color: '#093c54', fontSize: '1.5rem', lineHeight: '1.1' }}>{company.name || 'Pharma Company'}</strong>
+                  {company.tagline && <small style={{ color: '#687780' }}>{company.tagline}</small>}
+                </span>
+              </div>
+            )}
           </Link>
-          <button className="nav__toggle" aria-expanded={open} aria-controls="primary-nav" aria-label="Toggle menu" onClick={() => setOpen((o) => !o)}>
-            <Icon name={open ? 'close' : 'menu'} />
-          </button>
-          <nav id="primary-nav" className={`nav ${open ? 'nav--open' : ''}`} aria-label="Primary">
+
+          <form 
+            className="search-bar hide-mobile" 
+            style={{ display: 'flex', alignItems: 'center', flex: '1', maxWidth: '800px', height: '46px' }}
+            onSubmit={(e) => {
+              e.preventDefault();
+              const q = e.currentTarget.search.value;
+              const cat = e.currentTarget.category.value;
+              const params = new URLSearchParams();
+              if (q) params.set('search', q);
+              if (cat) params.set('category', cat);
+              navigate(`/products?${params.toString()}`);
+            }}
+          >
+            <div style={{ display: 'flex', flex: '1', height: '100%', border: '1px solid #e1e7ec', borderRight: 'none', borderRadius: '50px 0 0 50px', overflow: 'hidden', background: '#fff' }}>
+              <input name="search" type="text" placeholder="Search..." style={{ flex: '1', border: 'none', padding: '0 1.2rem', outline: 'none', fontSize: '0.95rem', height: '100%', background: 'transparent' }} />
+              <select name="category" style={{ border: 'none', borderLeft: '1px solid #e1e7ec', padding: '0 1rem', outline: 'none', backgroundColor: '#f9fafa', color: '#5b6b75', cursor: 'pointer', fontSize: '0.9rem', height: '100%' }}>
+                <option value="">All Categories</option>
+                {categories.data?.data?.map((c) => (
+                  <option key={c._id} value={c.slug}>
+                    {c.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <button type="submit" style={{ backgroundColor: '#105c48', color: '#fff', border: 'none', width: '64px', height: '46px', margin: 0, padding: 0, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '0 50px 50px 0' }}>
+              <Icon name="search" />
+            </button>
+          </form>
+
+          <div className="user-actions" style={{ display: 'flex', alignItems: 'center', gap: '2rem', whiteSpace: 'nowrap' }}>
+            <div className="hide-mobile" style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+              <span style={{ color: '#105c48', display: 'flex', fontSize: '1.5rem' }}><Icon name="user" /></span>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', lineHeight: '1.2' }}>
+                <span style={{ fontSize: '0.8rem', color: '#687780' }}>Sign In</span>
+                <strong style={{ fontSize: '0.95rem', color: '#093c54', fontWeight: '600' }}>My Account</strong>
+              </div>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer' }}>
+              <div style={{ position: 'relative', display: 'inline-flex', fontSize: '1.6rem', marginBottom: '2px' }}>
+                <span style={{ color: '#105c48', display: 'flex' }}><Icon name="cart" /></span>
+                <span style={{ position: 'absolute', top: '-6px', right: '-10px', backgroundColor: '#105c48', color: '#fff', fontSize: '0.7rem', borderRadius: '50%', width: '18px', height: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', border: '2px solid #fff', boxSizing: 'content-box' }}>0</span>
+              </div>
+            </div>
+            <button className="nav__toggle" aria-expanded={open} aria-controls="primary-nav" aria-label="Toggle menu" onClick={() => setOpen((o) => !o)} style={{ marginLeft: '1rem' }}>
+              <Icon name={open ? 'close' : 'menu'} />
+            </button>
+          </div>
+        </div>
+
+        <div className="container nav__inner" style={{ minHeight: '50px' }}>
+          <nav id="primary-nav" className={`nav ${open ? 'nav--open' : ''}`} aria-label="Primary" style={{ gap: '2.5rem' }}>
             {NAV.map((n) => (
-              <NavLink key={n.to} to={n.to} className={({ isActive }) => (isActive ? 'active' : '')}>
+              <NavLink key={n.to} to={n.to} className={({ isActive }) => (isActive ? 'active nav-bottom-link' : 'nav-bottom-link')} style={{ padding: '0.8rem 0 0.3rem 0', color: '#105c48', fontWeight: '600', fontSize: '0.95rem' }}>
                 {n.label}
               </NavLink>
             ))}
@@ -97,7 +157,19 @@ export default function PublicLayout() {
       <footer className="site-footer">
         <div className="container footer__grid">
           <div>
-            <h3 className="footer__brand">{company.name || 'Pharma Company'}</h3>
+            <Link to="/" className="brand footer__brand" aria-label={`${company.name || 'Home'} home`} style={{ display: 'inline-block', marginBottom: '1rem' }}>
+              {company.logo?.url ? (
+                <Img image={company.logo} className="brand__logo" style={{ maxHeight: '40px' }} />
+              ) : (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <span className="brand__mark" style={{ background: '#105c48', color: '#fff', borderRadius: '10px', fontSize: '2rem', padding: '0.2rem 0.6rem', display: 'flex' }}>+</span>
+                  <span className="brand__text">
+                    <strong style={{ color: '#000', fontSize: '1.5rem', lineHeight: '1.1' }}>{company.name || 'Pharma Company'}</strong>
+                    {company.tagline && <small style={{ color: '#105c48' }}>{company.tagline}</small>}
+                  </span>
+                </div>
+              )}
+            </Link>
             <p>{company.description}</p>
             <div className="social">
               {Object.entries(site.social || {})
