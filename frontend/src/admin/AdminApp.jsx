@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Routes, Route, Navigate, NavLink, Link, useLocation, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { useAuth } from '../lib/auth.jsx';
+import { useSettings, useFavicon } from '../lib/hooks.js';
 import { Loader, Icon } from '../components/ui.jsx';
 import { RESOURCES } from './resources.js';
 import Login from './Login.jsx';
@@ -56,6 +57,10 @@ const SidebarGroup = ({ title, defaultOpen = true, children }) => {
 
 function Shell({ children }) {
   const { user, logout, isAdmin, hasRole } = useAuth();
+  const { data: settingsData } = useSettings();
+  const siteSettings = settingsData?.data || {};
+  const faviconUrl = siteSettings.company?.favicon?.url;
+  useFavicon(faviconUrl);
   const [open, setOpen] = useState(true);
   const navigate = useNavigate();
   const close = () => setOpen(false);

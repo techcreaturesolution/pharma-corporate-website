@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { useApi } from '../lib/hooks.js';
+import { useApi, updateFavicon } from '../lib/hooks.js';
 import { put, parseError } from '../lib/api.js';
 import { Loader, ErrorState, Alert, Field } from '../components/ui.jsx';
 import { ImageInput, SeoFields, TagsInput } from './fields.jsx';
@@ -45,6 +45,10 @@ export default function Settings() {
       const res = await put('/admin/settings', payload);
       setValues(res.data);
       qc.invalidateQueries({ queryKey: ['/settings/public'] });
+      qc.invalidateQueries({ queryKey: ['/admin/settings'] });
+      if (res.data?.company?.favicon?.url) {
+        updateFavicon(res.data.company.favicon.url);
+      }
       setStatus({ msg: res.message, type: 'success' });
     } catch (err) {
       const p = parseError(err);

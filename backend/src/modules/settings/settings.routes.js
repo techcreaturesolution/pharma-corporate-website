@@ -72,7 +72,7 @@ const toPublic = (doc) => {
 
 export const getPublicSettings = async (req, res) => {
   const doc = await Settings.getSingleton();
-  res.set('Cache-Control', 'public, max-age=300');
+  res.set('Cache-Control', 'no-cache');
   return sendSuccess(res, { message: 'Settings retrieved successfully', data: toPublic(doc) });
 };
 

@@ -6,7 +6,7 @@ import { User } from '../modules/auth/user.model.js';
 export const ACCESS_COOKIE = 'access_token';
 export const REFRESH_COOKIE = 'refresh_token';
 
-const extractToken = (req) => {
+export const extractToken = (req) => {
   const header = req.headers.authorization;
   if (header?.startsWith('Bearer ')) return header.slice(7);
   return req.cookies?.[ACCESS_COOKIE] || null;

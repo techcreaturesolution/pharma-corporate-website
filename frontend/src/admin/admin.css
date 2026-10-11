@@ -64,11 +64,16 @@ table.admin-table { width: 100%; border-collapse: collapse; font-size: .92rem; }
 .modal { background: #fff; border-radius: var(--radius); width: min(960px, 100%); max-height: 90vh; overflow: auto; padding: 1.5rem; }
 .modal__head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
 .media-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: .75rem; }
-.media-grid figure { margin: 0; border: 2px solid transparent; border-radius: 8px; overflow: hidden; cursor: pointer; background: var(--bg-alt); position: relative; }
+.media-grid figure { margin: 0; border: 2px solid transparent; border-radius: 8px; overflow: hidden; cursor: pointer; background: var(--bg-alt); position: relative; transition: border-color .2s, box-shadow .2s; }
 .media-grid figure.selected, .media-grid figure:hover { border-color: var(--primary); }
-.media-grid img { width: 100%; aspect-ratio: 1; object-fit: cover; }
+.media-grid figure.is-checked { border-color: var(--danger); background: #fdf2f2; box-shadow: 0 0 0 2px rgba(192, 57, 43, 0.2); }
+.media-grid img { width: 100%; aspect-ratio: 1; object-fit: cover; display: block; }
 .media-grid .doc { aspect-ratio: 1; display: grid; place-items: center; font-size: .75rem; padding: .5rem; text-align: center; word-break: break-all; }
-.media-grid figcaption { font-size: .7rem; padding: .3rem .4rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.media-grid figcaption { font-size: .7rem; padding: .3rem .4rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; background: #fff; }
+.media-card-delete { position: absolute; top: 6px; right: 6px; z-index: 5; background: rgba(255, 255, 255, 0.95); border: 1px solid #f5b7b1; color: var(--danger); border-radius: 6px; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform .15s, background-color .15s, color .15s; box-shadow: 0 2px 6px rgba(0,0,0,0.12); padding: 0; }
+.media-card-delete:hover { background: var(--danger); color: #fff; border-color: var(--danger); transform: scale(1.1); }
+.media-card-checkbox { position: absolute; top: 6px; left: 6px; z-index: 5; cursor: pointer; background: rgba(255,255,255,0.92); border-radius: 4px; padding: 2px 3px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+.media-card-checkbox input { cursor: pointer; margin: 0; width: 16px; height: 16px; }
 .dropzone { border: 2px dashed var(--line); border-radius: 8px; padding: 1.25rem; text-align: center; color: var(--muted); margin-bottom: 1rem; }
 .detail-grid { display: grid; grid-template-columns: 160px 1fr; gap: .5rem 1rem; font-size: .95rem; }
 .detail-grid dt { color: var(--muted); }

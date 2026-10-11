@@ -143,6 +143,7 @@ export const Icon = ({ name, className, style, ...props }) => {
     arrow: 'M5 12h14M13 6l6 6-6 6',
     menu: 'M3 6h18M3 12h18M3 18h18',
     close: 'M6 6l12 12M18 6 6 18',
+    trash: 'M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6',
     search: 'M11 4a7 7 0 1 0 0 14 7 7 0 0 0 0-14zM21 21l-5-5',
     download: 'M12 3v12M6 11l6 6 6-6M4 21h16',
     truck: 'M1 3h15v13H1z M16 8h4l3 3v5h-7V8z M5.5 21a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z M17.5 21a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z',

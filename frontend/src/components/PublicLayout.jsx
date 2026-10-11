@@ -1,9 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { NavLink, Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { useSettings, useApi } from '../lib/hooks.js';
+import { useSettings, useApi, useFavicon } from '../lib/hooks.js';
 import { Icon, Img } from './ui.jsx';
-import { assetUrl } from '../lib/api.js';
 
 const NAV = [
   { to: '/', label: 'Home' },
@@ -24,6 +23,9 @@ export default function PublicLayout() {
   const categories = useApi('/categories', { limit: 100 });
   const site = data?.data || {};
   const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const headerRef = useRef(null);
+  const [headerHeight, setHeaderHeight] = useState(0);
   const { pathname } = useLocation();
   const navigate = useNavigate();
 
@@ -33,11 +35,37 @@ export default function PublicLayout() {
   }, [pathname]);
 
   useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 15);
+    };
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  useEffect(() => {
+    const measure = () => {
+      if (headerRef.current) {
+        setHeaderHeight(headerRef.current.offsetHeight);
+      }
+    };
+    measure();
+    const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(() => measure()) : null;
+    if (ro && headerRef.current) ro.observe(headerRef.current);
+    window.addEventListener('resize', measure);
+    return () => {
+      if (ro) ro.disconnect();
+      window.removeEventListener('resize', measure);
+    };
+  }, []);
+
+  useEffect(() => {
     // Analytics-ready: emit a page view event for GTM/GA if configured.
     if (window.dataLayer) window.dataLayer.push({ event: 'page_view', page_path: pathname });
   }, [pathname]);
 
   const company = site.company || {};
+  useFavicon(company.favicon?.url);
   const contact = site.contact || {};
   const gaId = site.analytics?.googleAnalyticsId;
   const gtmId = site.analytics?.googleTagManagerId;
@@ -45,7 +73,6 @@ export default function PublicLayout() {
   return (
     <>
       <Helmet>
-        {company.favicon?.url && <link rel="icon" href={assetUrl(company.favicon.url)} />}
         {gtmId && (
           <script>{`(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','${gtmId}');`}</script>
         )}
@@ -55,7 +82,7 @@ export default function PublicLayout() {
       <a href="#main" className="skip-link">
         Skip to content
       </a>
-      <header className="site-header" style={{ borderBottom: '1px solid #e1e7ec' }}>
+      <header ref={headerRef} className={`site-header ${scrolled ? 'site-header--scrolled' : ''}`}>
         <div className="topbar" style={{ background: '#f8fbfb', color: '#105c48' }}>
           <div className="container topbar__inner" style={{ fontSize: '0.85rem', fontWeight: '500', gap: '2rem' }}>
             {contact.email && (
@@ -141,14 +168,32 @@ export default function PublicLayout() {
 
         <div className="container nav__inner" style={{ minHeight: '50px' }}>
           <nav id="primary-nav" className={`nav ${open ? 'nav--open' : ''}`} aria-label="Primary" style={{ gap: '2.5rem' }}>
-            {NAV.map((n) => (
-              <NavLink key={n.to} to={n.to} className={({ isActive }) => (isActive ? 'active nav-bottom-link' : 'nav-bottom-link')} style={{ padding: '0.8rem 0 0.3rem 0', color: '#105c48', fontWeight: '600', fontSize: '0.95rem' }}>
+            {NAV.map((n, idx) => (
+              <NavLink
+                key={n.to}
+                to={n.to}
+                className={({ isActive }) => (isActive ? 'active nav-bottom-link' : 'nav-bottom-link')}
+                style={{
+                  padding: '0.8rem 0 0.3rem 0',
+                  color: '#105c48',
+                  fontWeight: '600',
+                  fontSize: '0.95rem',
+                  '--nav-i': idx,
+                }}
+              >
                 {n.label}
               </NavLink>
             ))}
           </nav>
         </div>
       </header>
+
+      {/* Header spacer to prevent page content overlap under fixed navbar */}
+      <div
+        className="site-header-spacer"
+        style={{ height: headerHeight ? `${headerHeight}px` : undefined }}
+        aria-hidden="true"
+      />
 
       <main id="main">
         <Outlet />
