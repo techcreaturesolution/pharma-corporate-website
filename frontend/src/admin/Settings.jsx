@@ -76,6 +76,8 @@ export default function Settings() {
           <Text label="Tagline" path="company.tagline" values={values} set={set} />
           <Text label="Legal name" path="company.legalName" values={values} set={set} />
           <Text label="Founded year" path="company.foundedYear" type="number" values={values} set={set} />
+          <Text label="Navbar title" path="company.navTitle" values={values} set={set} hint="Text displayed next to the logo in the website navbar" />
+          <Text label="Navbar small text" path="company.navSmallText" values={values} set={set} hint="Text displayed below the navbar title" />
           <Text label="Short description" path="company.description" type="textarea" values={values} set={set} />
           <Field label="Logo" name="logo">
             <ImageInput value={values.company?.logo} onChange={(v) => set('company.logo', v)} />

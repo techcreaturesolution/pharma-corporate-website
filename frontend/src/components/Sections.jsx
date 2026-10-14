@@ -107,20 +107,24 @@ const renderers = {
     </section>
   ),
   timeline: (s) => (
-    <section className="section">
-      <div className="container container--narrow">
+    <section className="section timeline-section">
+      <div className="container">
         <SectionHead s={s} />
-        <ol className="timeline">
+        <div className="timeline">
+          <div className="timeline__line" />
           {s.items?.map((it, i) => (
-            <li key={i}>
-              <span className="timeline__year">{it.value}</span>
-              <div>
-                <h3>{it.title}</h3>
-                <p>{it.description}</p>
+            <div key={i} className={`timeline__item ${i % 2 === 0 ? 'timeline__item--top' : 'timeline__item--bottom'}`}>
+              <div className="timeline__dot">
+                <span className="timeline__dot-inner" />
               </div>
-            </li>
+              <div className="timeline__content">
+                <span className="timeline__year">{it.value}</span>
+                <h3 className="timeline__title">{it.title}</h3>
+                <p className="timeline__desc">{it.description}</p>
+              </div>
+            </div>
           ))}
-        </ol>
+        </div>
       </div>
     </section>
   ),

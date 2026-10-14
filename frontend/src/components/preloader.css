@@ -1,0 +1,323 @@
+/* ========================================================
+   Pharma Website Preloader Styles
+   Liquid Wave Filling Animation (#20BF55) with Off-White Background
+   ======================================================== */
+
+.preloader-overlay {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 999999;
+  background: #f7faf9;
+  background: radial-gradient(circle at 50% 45%, #ffffff 0%, #f4f8f6 75%, #eef3f0 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  user-select: none;
+  transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1), transform 0.65s cubic-bezier(0.16, 1, 0.3, 1), filter 0.65s ease;
+  will-change: opacity, transform;
+}
+
+.preloader-overlay--exiting {
+  opacity: 0;
+  transform: scale(1.03) translateY(-10px);
+  filter: blur(4px);
+  pointer-events: none;
+}
+
+/* Background ambient light ring */
+.preloader-ambient {
+  position: absolute;
+  width: 860px;
+  height: 860px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(32, 191, 85, 0.17) 0%, rgba(32, 191, 85, 0) 70%);
+  pointer-events: none;
+  animation: preloaderPulse 3s ease-in-out infinite alternate;
+}
+
+@keyframes preloaderPulse {
+  0% { transform: scale(0.85); opacity: 0.6; }
+  100% { transform: scale(1.15); opacity: 1; }
+}
+
+/* Central Stage */
+.preloader-stage {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+/* Icon Container - Ultra Large Hero Size */
+.preloader-icon-stage {
+  position: relative;
+  width: 300px;
+  height: 300px;
+  margin-bottom: 2.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Base Silhouette Image (Faint outline) */
+.preloader-icon-base {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  opacity: 0.18;
+  filter: grayscale(80%) brightness(0.65);
+  pointer-events: none;
+}
+
+/* Masked Liquid Wave Tank (strictly clipped to logo silhouette) */
+.preloader-wave-tank {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Rising liquid level container */
+.preloader-liquid-level {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  will-change: transform;
+  pointer-events: none;
+}
+
+/* Liquid waves container extending below surface */
+.preloader-waves-wrap {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 400px;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.preloader-wave-svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 200%;
+  height: 100%;
+  pointer-events: none;
+  overflow: visible;
+}
+
+/* Deep back liquid wave (emerald semi-translucent, rolling left) */
+.wave--back {
+  fill: rgba(18, 140, 68, 0.52);
+  animation: waveRollBack 2.6s linear infinite;
+}
+
+/* Front main liquid wave (vibrant #20BF55, rolling right) */
+.wave--front {
+  fill: #20BF55;
+  filter: drop-shadow(0 4px 12px rgba(32, 191, 85, 0.45));
+  animation: waveRollFront 1.7s linear infinite;
+}
+
+/* Glowing luminous wave crest stroke */
+.wave--crest-glow {
+  filter: drop-shadow(0 0 6px rgba(74, 229, 124, 0.8));
+  animation: waveRollFront 1.7s linear infinite;
+}
+
+@keyframes waveRollBack {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+@keyframes waveRollFront {
+  0% { transform: translateX(-50%); }
+  100% { transform: translateX(0); }
+}
+
+/* Effervescent liquid bubbles floating upward */
+.preloader-bubble {
+  position: absolute;
+  bottom: 40px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.3));
+  box-shadow: 0 0 5px rgba(255, 255, 255, 0.7);
+  pointer-events: none;
+}
+
+.bubble-1 {
+  width: 9px;
+  height: 9px;
+  left: 28%;
+  animation: bubbleFlowUp 1.8s infinite ease-in;
+}
+
+.bubble-2 {
+  width: 13px;
+  height: 13px;
+  left: 55%;
+  animation: bubbleFlowUp 2.3s infinite ease-in 0.5s;
+}
+
+.bubble-3 {
+  width: 7px;
+  height: 7px;
+  left: 42%;
+  animation: bubbleFlowUp 1.9s infinite ease-in 0.9s;
+}
+
+.bubble-4 {
+  width: 11px;
+  height: 11px;
+  left: 68%;
+  animation: bubbleFlowUp 2.5s infinite ease-in 1.3s;
+}
+
+@keyframes bubbleFlowUp {
+  0% { transform: translateY(0) scale(0.6); opacity: 0; }
+  30% { opacity: 0.95; }
+  100% { transform: translateY(-260px) scale(1.15); opacity: 0; }
+}
+
+/* Completed Logo revealed at 100% */
+.preloader-icon-complete {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  opacity: 0;
+  transform: scale(0.96);
+  transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+  z-index: 5;
+}
+
+.preloader-icon-complete.is-complete {
+  opacity: 1;
+  transform: scale(1);
+  filter: drop-shadow(0 0 28px rgba(32, 191, 85, 0.5));
+}
+
+/* Glowing ring at 100% completion */
+.preloader-glow-ring {
+  position: absolute;
+  inset: -20px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(32, 191, 85, 0.45) 0%, rgba(32, 191, 85, 0) 70%);
+  opacity: 0;
+  transform: scale(0.8);
+  transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+}
+
+.preloader-glow-ring.is-active {
+  opacity: 1;
+  transform: scale(1.2);
+}
+
+/* Brand Text Container */
+.preloader-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  margin-bottom: 0;
+}
+
+/* Title liquid filling */
+.preloader-title-wrap {
+  position: relative;
+  display: inline-block;
+  line-height: 1.15;
+}
+
+.preloader-title {
+  font-size: 2.6rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin: 0;
+  display: block;
+}
+
+.preloader-title--base {
+  color: #cbd5e1;
+}
+
+.preloader-title--fill {
+  position: absolute;
+  inset: 0;
+  color: #20BF55;
+  pointer-events: none;
+  will-change: clip-path;
+  transition: clip-path 0.05s linear;
+}
+
+/* Subtitle liquid filling */
+.preloader-subtitle-wrap {
+  position: relative;
+  display: inline-block;
+  margin-top: 0.5rem;
+  line-height: 1.2;
+}
+
+.preloader-subtitle {
+  font-size: 1.15rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin: 0;
+  display: block;
+}
+
+.preloader-subtitle--base {
+  color: #94a3b8;
+}
+
+.preloader-subtitle--fill {
+  position: absolute;
+  inset: 0;
+  color: #105c48;
+  pointer-events: none;
+  will-change: clip-path;
+  transition: clip-path 0.05s linear;
+}
+
+@media (max-width: 640px) {
+  .preloader-ambient {
+    width: 480px;
+    height: 480px;
+  }
+  .preloader-icon-stage {
+    width: 200px;
+    height: 200px;
+    margin-bottom: 1.6rem;
+  }
+  .preloader-title {
+    font-size: 1.9rem;
+  }
+  .preloader-subtitle {
+    font-size: 0.95rem;
+  }
+}

@@ -3,7 +3,7 @@ import { Routes, Route, Navigate, NavLink, Link, useLocation, useNavigate } from
 import { Helmet } from 'react-helmet-async';
 import { useAuth } from '../lib/auth.jsx';
 import { useSettings, useFavicon } from '../lib/hooks.js';
-import { Loader, Icon } from '../components/ui.jsx';
+import { Loader, Icon, Img } from '../components/ui.jsx';
 import { RESOURCES } from './resources.js';
 import Login from './Login.jsx';
 import Dashboard from './Dashboard.jsx';
@@ -34,21 +34,19 @@ const SidebarGroup = ({ title, defaultOpen = true, children }) => {
       <div 
         className="admin__group" 
         onClick={() => setOpen(!open)}
-        style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', userSelect: 'none' }}
       >
-        <span>{title}</span>
+        <span className="admin__group-title">{title}</span>
         <svg 
+          className="admin__group-chevron"
           width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
           style={{ transform: open ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }}
         >
           <polyline points="6 9 12 15 18 9"></polyline>
         </svg>
       </div>
-      <div style={{ display: 'grid', gridTemplateRows: open ? '1fr' : '0fr', transition: 'grid-template-rows 0.25s ease-out' }}>
-        <div style={{ overflow: 'hidden' }}>
-          <div className="admin__group-content" style={{ display: 'flex', flexDirection: 'column', gap: '.25rem', marginLeft: '0.75rem', paddingLeft: '0.5rem', borderLeft: '1px solid rgba(255, 255, 255, 0.15)', marginTop: '0.25rem', marginBottom: '0.5rem' }}>
-            {children}
-          </div>
+      <div className={`admin__group-collapse ${open ? 'admin__group-collapse--open' : ''}`}>
+        <div className="admin__group-content">
+          {children}
         </div>
       </div>
     </div>
@@ -59,11 +57,17 @@ function Shell({ children }) {
   const { user, logout, isAdmin, hasRole } = useAuth();
   const { data: settingsData } = useSettings();
   const siteSettings = settingsData?.data || {};
-  const faviconUrl = siteSettings.company?.favicon?.url;
+  const company = siteSettings.company || {};
+  const faviconUrl = company.favicon?.url;
   useFavicon(faviconUrl);
+  const brandLogo = company.logo?.url ? company.logo : (company.favicon?.url ? company.favicon : null);
   const [open, setOpen] = useState(true);
   const navigate = useNavigate();
-  const close = () => setOpen(false);
+  const close = () => {
+    if (typeof window !== 'undefined' && window.innerWidth <= 960) {
+      setOpen(false);
+    }
+  };
 
   return (
     <div className={`admin ${!open ? 'admin--sidebar-closed' : ''}`}>
@@ -72,76 +76,136 @@ function Shell({ children }) {
         <meta name="robots" content="noindex, nofollow" />
       </Helmet>
       <aside className={`admin__side ${open ? 'admin__side--open' : ''}`}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
-          <Link to="/admin" className="admin__brand" onClick={close} style={{ marginBottom: 0, flex: 1, minWidth: 0, overflow: 'hidden' }}>
-            <span className="brand__mark" style={{ width: 30, height: 30, fontSize: '1.1rem', flexShrink: 0 }}>+</span> 
-            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>Pharma CMS</span>
-          </Link>
-          <button type="button" onClick={() => setOpen(!open)} style={{ background: 'transparent', border: 'none', color: '#fff', cursor: 'pointer', padding: '0.25rem', display: 'flex' }} aria-label="Toggle sidebar">
-            <Icon name="menu" style={{ width: 20, height: 20 }} />
-          </button>
-        </div>
-        <NavLink to="/admin" end onClick={close}>
-          <Icon name="layout" style={{ width: 16, height: 16 }} /> Dashboard
+        <Link to="/admin" className="admin__brand" onClick={close} title={company.navTitle || company.name || 'Pharma CMS'}>
+          {brandLogo?.url ? (
+            <Img
+              image={brandLogo}
+              alt={company.name || 'Logo'}
+              className="admin__brand-logo"
+            />
+          ) : (
+            <span className="brand__mark">+</span>
+          )}
+          <span className="admin__brand-text">
+            <span className="admin__brand-title">
+              {company.navTitle || company.name || 'Pharma CMS'}
+            </span>
+            {company.navSmallText && (
+              <small className="admin__brand-subtitle">
+                {company.navSmallText}
+              </small>
+            )}
+          </span>
+        </Link>
+        <NavLink to="/admin" end onClick={close} title="Dashboard">
+          <Icon name="layout" style={{ width: 18, height: 18 }} />
+          <span className="admin__link-text">Dashboard</span>
         </NavLink>
         <SidebarGroup title="Catalogue">
-          <NavLink to="/admin/products" onClick={close}><Icon name="box" style={{ width: 16, height: 16 }} /> Products</NavLink>
-          <NavLink to="/admin/categories" onClick={close}><Icon name="layers" style={{ width: 16, height: 16 }} /> Categories</NavLink>
+          <NavLink to="/admin/products" onClick={close} title="Products">
+            <Icon name="box" style={{ width: 18, height: 18 }} />
+            <span className="admin__link-text">Products</span>
+          </NavLink>
+          <NavLink to="/admin/categories" onClick={close} title="Categories">
+            <Icon name="layers" style={{ width: 18, height: 18 }} />
+            <span className="admin__link-text">Categories</span>
+          </NavLink>
         </SidebarGroup>
         <SidebarGroup title="Content">
-          <NavLink to="/admin/pages" onClick={close}><Icon name="book" style={{ width: 16, height: 16 }} /> Pages</NavLink>
+          <NavLink to="/admin/pages" onClick={close} title="Pages">
+            <Icon name="book" style={{ width: 18, height: 18 }} />
+            <span className="admin__link-text">Pages</span>
+          </NavLink>
           {['capabilities', 'certifications', 'facilities', 'leadership', 'news', 'gallery'].map((k) => {
             const iconMap = { capabilities: 'activity', certifications: 'award', facilities: 'factory', leadership: 'users', news: 'newspaper', gallery: 'image' };
             return (
-              <NavLink key={k} to={`/admin/${k}`} onClick={close}>
-                <Icon name={iconMap[k] || 'file'} style={{ width: 16, height: 16 }} /> {RESOURCES[k].label}
+              <NavLink key={k} to={`/admin/${k}`} onClick={close} title={RESOURCES[k].label}>
+                <Icon name={iconMap[k] || 'file'} style={{ width: 18, height: 18 }} />
+                <span className="admin__link-text">{RESOURCES[k].label}</span>
               </NavLink>
             );
           })}
-          <NavLink to="/admin/media" onClick={close}><Icon name="folder" style={{ width: 16, height: 16 }} /> Media library</NavLink>
+          <NavLink to="/admin/media" onClick={close} title="Media library">
+            <Icon name="folder" style={{ width: 18, height: 18 }} />
+            <span className="admin__link-text">Media library</span>
+          </NavLink>
         </SidebarGroup>
         <SidebarGroup title="Recruitment">
-          <NavLink to="/admin/careers" onClick={close}><Icon name="briefcase" style={{ width: 16, height: 16 }} /> Vacancies</NavLink>
-          {isAdmin && <NavLink to="/admin/applications" onClick={close}><Icon name="mail" style={{ width: 16, height: 16 }} /> Applications</NavLink>}
+          <NavLink to="/admin/careers" onClick={close} title="Vacancies">
+            <Icon name="briefcase" style={{ width: 18, height: 18 }} />
+            <span className="admin__link-text">Vacancies</span>
+          </NavLink>
+          {isAdmin && (
+            <NavLink to="/admin/applications" onClick={close} title="Applications">
+              <Icon name="mail" style={{ width: 18, height: 18 }} />
+              <span className="admin__link-text">Applications</span>
+            </NavLink>
+          )}
         </SidebarGroup>
         {isAdmin && (
           <>
             <SidebarGroup title="Leads">
-              <NavLink to="/admin/enquiries" onClick={close}><Icon name="message-square" style={{ width: 16, height: 16 }} /> Enquiries</NavLink>
+              <NavLink to="/admin/enquiries" onClick={close} title="Enquiries">
+                <Icon name="message-square" style={{ width: 18, height: 18 }} />
+                <span className="admin__link-text">Enquiries</span>
+              </NavLink>
             </SidebarGroup>
             <SidebarGroup title="System">
-              <NavLink to="/admin/settings" onClick={close}><Icon name="settings" style={{ width: 16, height: 16 }} /> Site settings</NavLink>
+              <NavLink to="/admin/settings" onClick={close} title="Site settings">
+                <Icon name="settings" style={{ width: 18, height: 18 }} />
+                <span className="admin__link-text">Site settings</span>
+              </NavLink>
             </SidebarGroup>
           </>
         )}
-        {hasRole('superadmin') && <NavLink to="/admin/users" onClick={close}><Icon name="users" style={{ width: 16, height: 16 }} /> Users</NavLink>}
-        <NavLink to="/admin/profile" onClick={close}><Icon name="user" style={{ width: 16, height: 16 }} /> My account</NavLink>
-        <a href="/" target="_blank" rel="noreferrer" style={{ marginTop: 'auto' }}>
-          View website ↗
+        {hasRole('superadmin') && (
+          <NavLink to="/admin/users" onClick={close} title="Users">
+            <Icon name="users" style={{ width: 18, height: 18 }} />
+            <span className="admin__link-text">Users</span>
+          </NavLink>
+        )}
+        <NavLink to="/admin/profile" onClick={close} title="My account">
+          <Icon name="user" style={{ width: 18, height: 18 }} />
+          <span className="admin__link-text">My account</span>
+        </NavLink>
+        <a href="/" target="_blank" rel="noreferrer" className="admin__view-site" title="View website" style={{ marginTop: 'auto' }}>
+          <Icon name="globe" style={{ width: 18, height: 18 }} />
+          <span className="admin__link-text">View website ↗</span>
         </a>
       </aside>
       <div className="admin__main">
-        <div className="admin__top">
-          <button className="icon-btn admin__toggle" onClick={() => setOpen((o) => !o)} aria-label="Toggle navigation">
-            <Icon name="menu" />
-          </button>
-          <span className="spacer" />
-          <div className="admin__user">
-            <span>
-              {user.name} · <em>{user.role}</em>
-            </span>
+        <header className="admin__topbar">
+          <div className="admin__topbar-left">
             <button
-              className="btn btn--outline btn--sm"
-              onClick={async () => {
-                await logout();
-                navigate('/admin/login');
-              }}
+              type="button"
+              className="admin__hamburger-btn"
+              onClick={() => setOpen((o) => !o)}
+              aria-label="Toggle navigation"
+              title="Toggle sidebar"
             >
-              Sign out
+              <Icon name="menu" />
             </button>
           </div>
-        </div>
-        {children}
+          <div className="admin__topbar-right">
+            <div className="admin__user">
+              <span className="admin__user-name">{user.name}</span>
+              <span className="admin__user-role">{user.role}</span>
+              <button
+                type="button"
+                className="btn btn--outline btn--sm"
+                onClick={async () => {
+                  await logout();
+                  navigate('/admin/login');
+                }}
+              >
+                Sign out
+              </button>
+            </div>
+          </div>
+        </header>
+        <main className="admin__body">
+          {children}
+        </main>
       </div>
     </div>
   );

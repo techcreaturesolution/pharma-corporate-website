@@ -22,6 +22,8 @@ const settingsSchema = new mongoose.Schema(
     key: { type: String, default: 'site', unique: true },
     company: {
       name: { type: String, trim: true, default: 'Pharma Company' },
+      navTitle: { type: String, trim: true },
+      navSmallText: { type: String, trim: true },
       tagline: { type: String, trim: true },
       legalName: { type: String, trim: true },
       foundedYear: { type: Number },

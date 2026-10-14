@@ -3,6 +3,7 @@ import { NavLink, Link, Outlet, useLocation, useNavigate } from 'react-router-do
 import { Helmet } from 'react-helmet-async';
 import { useSettings, useApi, useFavicon } from '../lib/hooks.js';
 import { Icon, Img } from './ui.jsx';
+import Preloader from './Preloader.jsx';
 
 const NAV = [
   { to: '/', label: 'Home' },
@@ -17,6 +18,93 @@ const NAV = [
   { to: '/gallery', label: 'Gallery' },
   { to: '/contact', label: 'Contact' },
 ];
+
+function CategoryDropdown({ categories = [] }) {
+  const [open, setOpen] = useState(false);
+  const [selected, setSelected] = useState('');
+  const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const selectedCategoryObj = categories.find((c) => c.slug === selected);
+  const currentLabel = selectedCategoryObj ? selectedCategoryObj.name : 'All Categories';
+
+  const handleSelect = (slug) => {
+    setSelected(slug);
+    setOpen(false);
+  };
+
+  return (
+    <div className="cat-dropdown" ref={dropdownRef}>
+      <input type="hidden" name="category" value={selected} />
+      <button
+        type="button"
+        className={`cat-dropdown__trigger ${open ? 'cat-dropdown__trigger--open' : ''}`}
+        onClick={() => setOpen(!open)}
+        aria-expanded={open}
+        aria-haspopup="listbox"
+      >
+        <span className="cat-dropdown__label">{currentLabel}</span>
+        <svg
+          className={`cat-dropdown__chevron ${open ? 'cat-dropdown__chevron--open' : ''}`}
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <polyline points="6 9 12 15 18 9" />
+        </svg>
+      </button>
+
+      {open && (
+        <div className="cat-dropdown__menu" role="listbox">
+          <div
+            className={`cat-dropdown__item ${selected === '' ? 'cat-dropdown__item--selected' : ''}`}
+            onClick={() => handleSelect('')}
+            role="option"
+            aria-selected={selected === ''}
+          >
+            <span className="cat-dropdown__item-text">All Categories</span>
+            {selected === '' && (
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+            )}
+          </div>
+          <div className="cat-dropdown__divider" />
+          {categories.map((c) => (
+            <div
+              key={c._id}
+              className={`cat-dropdown__item ${selected === c.slug ? 'cat-dropdown__item--selected' : ''}`}
+              onClick={() => handleSelect(c.slug)}
+              role="option"
+              aria-selected={selected === c.slug}
+            >
+              <span className="cat-dropdown__item-text">{c.name}</span>
+              {selected === c.slug && (
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function PublicLayout() {
   const { data } = useSettings();
@@ -72,6 +160,7 @@ export default function PublicLayout() {
 
   return (
     <>
+      <Preloader company={company} />
       <Helmet>
         {gtmId && (
           <script>{`(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','${gtmId}');`}</script>
@@ -82,6 +171,8 @@ export default function PublicLayout() {
       <a href="#main" className="skip-link">
         Skip to content
       </a>
+
+      {/* header top bar and search  */}
       <header ref={headerRef} className={`site-header ${scrolled ? 'site-header--scrolled' : ''}`}>
         <div className="topbar" style={{ background: '#f8fbfb', color: '#105c48' }}>
           <div className="container topbar__inner" style={{ fontSize: '0.85rem', fontWeight: '500', gap: '2rem' }}>
@@ -102,24 +193,30 @@ export default function PublicLayout() {
           </div>
         </div>
         
-        <div className="container middlebar" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1rem 0', gap: '2rem' }}>
-          <Link to="/" className="brand" aria-label={`${company.name || 'Home'} home`}>
+        {/* middle bar  */}
+        <div className="container middlebar" style={{ position: 'relative', zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1rem 0', gap: '2rem' }}>
+          <Link to="/" className="brand" aria-label={`${company.navTitle || company.name || 'Home'} home`}>
             {company.logo?.url ? (
               <Img image={company.logo} className="brand__logo" style={{ maxHeight: '48px' }} />
             ) : (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <span className="brand__mark" style={{ background: '#105c48', color: '#fff', borderRadius: '10px', fontSize: '2rem', padding: '0.2rem 0.6rem', display: 'flex' }}>+</span>
-                <span className="brand__text">
-                  <strong style={{ color: '#093c54', fontSize: '1.5rem', lineHeight: '1.1' }}>{company.name || 'Pharma Company'}</strong>
-                  {company.tagline && <small style={{ color: '#687780' }}>{company.tagline}</small>}
-                </span>
-              </div>
+              <span className="brand__mark" style={{ background: '#105c48', color: '#fff', borderRadius: '10px', fontSize: '2rem', padding: '0.2rem 0.6rem', display: 'flex' }}>+</span>
             )}
+            {company.navTitle ? (
+              <span className="brand__text">
+                <strong style={{ color: '#093c54', fontSize: '1.4rem', fontWeight: '700', lineHeight: '1.1' }}>{company.navTitle}</strong>
+                {company.navSmallText && <small style={{ color: '#687780', display: 'block', fontSize: '0.9rem' }}>{company.navSmallText}</small>}
+              </span>
+            ) : !company.logo?.url ? (
+              <span className="brand__text">
+                <strong style={{ color: '#093c54', fontSize: '1.5rem', lineHeight: '1.1' }}>{company.name || 'Pharma Company'}</strong>
+                {company.tagline && <small style={{ color: '#687780' }}>{company.tagline}</small>}
+              </span>
+            ) : null}
           </Link>
 
           <form 
             className="search-bar hide-mobile" 
-            style={{ display: 'flex', alignItems: 'center', flex: '1', maxWidth: '800px', height: '46px' }}
+            style={{ display: 'flex', alignItems: 'center', flex: '1', maxWidth: '800px', height: '46px', position: 'relative', zIndex: 60 }}
             onSubmit={(e) => {
               e.preventDefault();
               const q = e.currentTarget.search.value;
@@ -130,16 +227,9 @@ export default function PublicLayout() {
               navigate(`/products?${params.toString()}`);
             }}
           >
-            <div style={{ display: 'flex', flex: '1', height: '100%', border: '1px solid #e1e7ec', borderRight: 'none', borderRadius: '50px 0 0 50px', overflow: 'hidden', background: '#fff' }}>
-              <input name="search" type="text" placeholder="Search..." style={{ flex: '1', border: 'none', padding: '0 1.2rem', outline: 'none', fontSize: '0.95rem', height: '100%', background: 'transparent' }} />
-              <select name="category" style={{ border: 'none', borderLeft: '1px solid #e1e7ec', padding: '0 1rem', outline: 'none', backgroundColor: '#f9fafa', color: '#5b6b75', cursor: 'pointer', fontSize: '0.9rem', height: '100%' }}>
-                <option value="">All Categories</option>
-                {categories.data?.data?.map((c) => (
-                  <option key={c._id} value={c.slug}>
-                    {c.name}
-                  </option>
-                ))}
-              </select>
+            <div style={{ display: 'flex', flex: '1', height: '100%', border: '1px solid #e1e7ec', borderRight: 'none', borderRadius: '50px 0 0 50px', background: '#fff', position: 'relative', zIndex: 60 }}>
+              <input name="search" type="text" placeholder="Search..." style={{ flex: '1', border: 'none', padding: '0 1.2rem', outline: 'none', fontSize: '0.95rem', height: '100%', background: 'transparent', borderRadius: '50px 0 0 50px' }} />
+              <CategoryDropdown categories={categories.data?.data || []} />
             </div>
             <button type="submit" style={{ backgroundColor: '#105c48', color: '#fff', border: 'none', width: '64px', height: '46px', margin: 0, padding: 0, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '0 50px 50px 0' }}>
               <Icon name="search" />
@@ -166,7 +256,9 @@ export default function PublicLayout() {
           </div>
         </div>
 
-        <div className="container nav__inner" style={{ minHeight: '50px' }}>
+        {/* nav inner  primary Nav Links HOME , ABOUT, PRODUCTION*/}
+
+        <div className="container nav__inner" style={{ position: 'relative', zIndex: 10, minHeight: '50px' }}>
           <nav id="primary-nav" className={`nav ${open ? 'nav--open' : ''}`} aria-label="Primary" style={{ gap: '2.5rem' }}>
             {NAV.map((n, idx) => (
               <NavLink
@@ -198,22 +290,29 @@ export default function PublicLayout() {
       <main id="main">
         <Outlet />
       </main>
-
+       {/* footer */}
+       {/* footer */}
+       
       <footer className="site-footer">
         <div className="container footer__grid">
           <div>
-            <Link to="/" className="brand footer__brand" aria-label={`${company.name || 'Home'} home`} style={{ display: 'inline-block', marginBottom: '1rem' }}>
+            <Link to="/" className="brand footer__brand" aria-label={`${company.navTitle || company.name || 'Home'} home`} style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', marginBottom: '1rem', textDecoration: 'none' }}>
               {company.logo?.url ? (
                 <Img image={company.logo} className="brand__logo" style={{ maxHeight: '40px' }} />
               ) : (
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <span className="brand__mark" style={{ background: '#105c48', color: '#fff', borderRadius: '10px', fontSize: '2rem', padding: '0.2rem 0.6rem', display: 'flex' }}>+</span>
-                  <span className="brand__text">
-                    <strong style={{ color: '#000', fontSize: '1.5rem', lineHeight: '1.1' }}>{company.name || 'Pharma Company'}</strong>
-                    {company.tagline && <small style={{ color: '#105c48' }}>{company.tagline}</small>}
-                  </span>
-                </div>
+                <span className="brand__mark" style={{ background: '#105c48', color: '#fff', borderRadius: '10px', fontSize: '2rem', padding: '0.2rem 0.6rem', display: 'flex' }}>+</span>
               )}
+              {company.navTitle ? (
+                <span className="brand__text">
+                  <strong style={{ color: '#000', fontSize: '1.4rem', lineHeight: '1.1' }}>{company.navTitle}</strong>
+                  {company.navSmallText && <small style={{ color: '#687780', display: 'block', fontSize: '0.9rem' }}>{company.navSmallText}</small>}
+                </span>
+              ) : !company.logo?.url ? (
+                <span className="brand__text">
+                  <strong style={{ color: '#000', fontSize: '1.5rem', lineHeight: '1.1' }}>{company.name || 'Pharma Company'}</strong>
+                  {(company.navSmallText || company.tagline) && <small style={{ color: '#105c48', display: 'block', fontSize: '0.9rem' }}>{company.navSmallText || company.tagline}</small>}
+                </span>
+              ) : null}
             </Link>
             <p>{company.description}</p>
             <div className="social">

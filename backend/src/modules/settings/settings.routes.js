@@ -24,6 +24,8 @@ const addressJoi = Joi.object({
 const settingsSchema = Joi.object({
   company: Joi.object({
     name: str(150),
+    navTitle: str(150),
+    navSmallText: str(150),
     tagline: str(200),
     legalName: str(200),
     foundedYear: Joi.number().integer().min(1800).max(2100).allow(null),
