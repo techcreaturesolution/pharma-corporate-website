@@ -17,7 +17,7 @@ export default function Capabilities() {
       <>
         <Seo title={c.title} description={c.summary} seo={c.seo} image={c.images?.[0]?.url} />
         <PageHeader title={c.title} subtitle={c.summary} crumbs={[{ label: 'Capabilities', to: '/capabilities' }, { label: c.title }]} />
-        <section className="section">
+        <section className="section capability-detail">
           <div className="container split">
             <div>
               <RichHtml html={c.description} />
@@ -50,7 +50,7 @@ export default function Capabilities() {
           {list.data?.data?.length === 0 && <EmptyState />}
           <div className="grid grid--3">
             {list.data?.data?.map((c) => (
-              <article key={c._id} className="card feature">
+              <article key={c._id} className="card feature capability-card">
                 <span className="feature__icon">
                   <Icon name={c.icon || 'flask'} />
                 </span>

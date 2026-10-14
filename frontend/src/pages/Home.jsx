@@ -60,14 +60,14 @@ export default function Home() {
       <Sections sections={sections.filter((s) => !['hero', 'stats', 'cta'].includes(s.type))} />
 
       {capabilities.data?.data?.length > 0 && (
-        <section className="section section--alt">
+        <section className="section section--alt capabilities-section">
           <div className="container">
             <div className="section__head">
               <h2 className="section__title">Our capabilities</h2>
             </div>
             <div className="grid grid--4">
               {capabilities.data.data.map((c) => (
-                <Link key={c._id} to={`/capabilities/${c.slug}`} className="card feature">
+                <Link key={c._id} to={`/capabilities/${c.slug}`} className="card feature capability-card">
                   <span className="feature__icon">
                     <Icon name={c.icon || 'flask'} />
                   </span>
