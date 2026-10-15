@@ -212,6 +212,10 @@ function Shell({ children }) {
 }
 
 export default function AdminApp() {
+  const { data: settingsData } = useSettings();
+  const company = settingsData?.data?.company || {};
+  useFavicon(company.favicon?.url);
+
   return (
     <Routes>
       <Route path="login" element={<Login />} />

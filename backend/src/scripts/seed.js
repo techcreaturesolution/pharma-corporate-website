@@ -189,10 +189,99 @@ await upsert(Leader, { name: 'Jane Doe' }, { designation: 'Managing Director', b
 await upsert(News, { slug: 'welcome-to-our-new-website' }, {
   title: 'Welcome to our new website', summary: 'Placeholder news summary.', content: '<p>Placeholder news content.</p>', status: 'published', publishedAt: new Date(),
 });
-await upsert(Job, { slug: 'quality-control-analyst' }, {
-  title: 'Quality Control Analyst', department: 'Quality', location: 'City, Country', employmentType: 'Full-time', experience: '2–4 years',
-  description: '<p>Placeholder job description.</p>', responsibilities: ['Placeholder responsibility'], requirements: ['Placeholder requirement'], status: 'open',
-});
+const sampleJobs = [
+  {
+    slug: 'quality-control-analyst',
+    title: 'Quality Control Analyst',
+    department: 'Quality',
+    location: 'City, Country',
+    employmentType: 'Full-time',
+    experience: '2–4 years',
+    qualification: 'B.Sc / M.Sc Chemistry or B.Pharm',
+    description: '<p>Perform rigorous instrumental analysis of raw materials, in-process samples, and finished APIs using HPLC, GC, and UV-Vis spectrophotometry adhering to international pharmacopoeial standards.</p>',
+    responsibilities: [
+      'Execute routine and non-routine testing of raw materials and finished pharmaceutical formulations',
+      'Maintain, calibrate, and troubleshoot analytical instrumentation (HPLC, GC, UV-Vis)',
+      'Prepare and review analytical method validation protocols and reports',
+      'Ensure strict compliance with cGMP, GLP, and data integrity protocols'
+    ],
+    requirements: [
+      'Bachelor or Master degree in Chemistry, Pharmacy, or related field',
+      '2–4 years proven hands-on QC laboratory experience in a cGMP environment',
+      'Thorough knowledge of ICH guidelines, USP, EP, and IP monographs'
+    ],
+    status: 'open',
+  },
+  {
+    slug: 'formulation-rd-scientist',
+    title: 'Formulation R&D Scientist',
+    department: 'Research & Development',
+    location: 'R&D Center, Innovation Park',
+    employmentType: 'Full-time',
+    experience: '3–6 years',
+    qualification: 'M.Pharm / Ph.D. in Pharmaceutics',
+    description: '<p>Lead pre-formulation and formulation development of oral solid dosages and injectable pharmaceutical products from laboratory scale to pilot scale.</p>',
+    responsibilities: [
+      'Design, execute, and evaluate formulation trials for solid oral dosage forms and modified-release products',
+      'Conduct compatibility studies, accelerated stability studies, and stress testing',
+      'Prepare comprehensive product development reports (PDR) and scale-up documentation',
+      'Collaborate with analytical R&D for robust method validation and transfer'
+    ],
+    requirements: [
+      'M.Pharm in Pharmaceutics or Ph.D. in Pharmaceutical Sciences',
+      '3–6 years of demonstrated experience in formulation development',
+      'Strong expertise in granulation, compression, coating, and characterization techniques'
+    ],
+    status: 'open',
+  },
+  {
+    slug: 'production-executive-api',
+    title: 'Production Executive — API',
+    department: 'Manufacturing',
+    location: 'Main Manufacturing Facility',
+    employmentType: 'Full-time',
+    experience: '2–5 years',
+    qualification: 'B.Tech Chemical / M.Sc Chemistry',
+    description: '<p>Oversee daily chemical synthesis and batch processing operations in modern cGMP Active Pharmaceutical Ingredient (API) production blocks.</p>',
+    responsibilities: [
+      'Supervise shop-floor chemical reactions, crystallization, filtration, and drying operations',
+      'Execute and audit Batch Manufacturing Records (BMR) and equipment logs in real-time',
+      'Enforce occupational health, environmental safety (EHS), and cleanroom sanitation protocols',
+      'Participate in deviation investigations, root-cause analyses, and CAPA implementation'
+    ],
+    requirements: [
+      'B.Tech / B.E. in Chemical Engineering or M.Sc in Organic Chemistry',
+      '2–5 years experience in bulk drug / API manufacturing plants',
+      'Hands-on familiarity with DCS / PLC automated reactors and containment systems'
+    ],
+    status: 'open',
+  },
+  {
+    slug: 'regulatory-affairs-specialist',
+    title: 'Regulatory Affairs Specialist',
+    department: 'Regulatory Affairs',
+    location: 'Corporate Office',
+    employmentType: 'Full-time',
+    experience: '4–7 years',
+    qualification: 'B.Pharm / M.Pharm / Life Sciences',
+    description: '<p>Author, review, and assemble regulatory dossiers (DMF, CTD/eCTD) for submission to domestic and global health authorities.</p>',
+    responsibilities: [
+      'Compile regulatory submissions for USFDA, EMA, WHO, and other regulated markets',
+      'Coordinate across R&D, QC, and Production to collate compliant technical documentation',
+      'Manage queries, deficiency letters, and lifecycle maintenance of approved dossiers',
+      'Keep abreast of evolving global pharmaceutical regulations and guidelines'
+    ],
+    requirements: [
+      'B.Pharm / M.Pharm or relevant Life Sciences postgraduate degree',
+      '4–7 years in pharmaceutical regulatory affairs for regulated markets',
+      'Proficiency in eCTD compilation software and document management systems'
+    ],
+    status: 'open',
+  },
+];
+for (const j of sampleJobs) {
+  await upsert(Job, { slug: j.slug }, j);
+}
 await upsert(GalleryItem, { title: 'Facility exterior (placeholder)' }, {
   image: { url: 'https://placehold.co/800x600?text=Gallery', alt: 'Placeholder gallery image' }, category: 'Facilities', status: 'published',
 });
