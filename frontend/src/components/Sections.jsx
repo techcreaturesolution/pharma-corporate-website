@@ -135,6 +135,7 @@ const renderers = {
         {s.items?.map((it, i) => (
           <details key={i} className="faq">
             <summary>{it.title}</summary>
+
             <p>{it.description}</p>
           </details>
         ))}

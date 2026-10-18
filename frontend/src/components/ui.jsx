@@ -42,7 +42,58 @@ export const Img = ({ image, fallback = '/placeholder.svg', className, ...rest }
 
 export const PageHeader = ({ title, subtitle, crumbs = [] }) => (
   <header className="page-header">
-    <div className="container">
+    {/* Flowing Green Liquid Wave Animation Background (Half Filled / Adha Bhara Hua - Ultra Broad Calm Wave) */}
+    <div className="page-header__liquid-bg" aria-hidden="true">
+      {/* Layer 1: Deep Back Liquid Swell (slow rolling left - #20BF55) */}
+      <div className="page-header__wave-track page-header__wave-track--back">
+        <svg className="page-header__wave-svg" viewBox="0 0 2400 220" preserveAspectRatio="none">
+          <path
+            d="M 0,48 C 225.0,48.0 275.0,18.0 500.0,18.0 C 734.0,18.0 786.0,66.0 1020.0,66.0 C 1101.0,66.0 1119.0,48.0 1200.0,48.0 C 1425.0,48.0 1475.0,18.0 1700.0,18.0 C 1934.0,18.0 1986.0,66.0 2220.0,66.0 C 2301.0,66.0 2319.0,48.0 2400.0,48.0 V 220 H 0 Z"
+            fill="#20BF55"
+          />
+        </svg>
+      </div>
+
+      {/* Layer 2: Middle Vibrant Liquid Wave (slow rolling right - #20BF55) */}
+      <div className="page-header__wave-track page-header__wave-track--middle">
+        <svg className="page-header__wave-svg" viewBox="0 0 2400 220" preserveAspectRatio="none">
+          <path
+            d="M 0,56 C 171.0,56.0 209.0,72.0 380.0,72.0 C 605.0,72.0 655.0,22.0 880.0,22.0 C 1024.0,22.0 1056.0,56.0 1200.0,56.0 C 1371.0,56.0 1409.0,72.0 1580.0,72.0 C 1805.0,72.0 1855.0,22.0 2080.0,22.0 C 2224.0,22.0 2256.0,56.0 2400.0,56.0 V 220 H 0 Z"
+            fill="#20BF55"
+          />
+        </svg>
+      </div>
+
+      {/* Layer 3: Front Rich Liquid Wave (calm rolling left - #20BF55) + Luminous Wave Crest */}
+      <div className="page-header__wave-track page-header__wave-track--front">
+        <svg className="page-header__wave-svg" viewBox="0 0 2400 220" preserveAspectRatio="none">
+          <path
+            d="M 0,50 C 189.0,50.0 231.0,16.0 420.0,16.0 C 645.0,16.0 695.0,68.0 920.0,68.0 C 1046.0,68.0 1074.0,50.0 1200.0,50.0 C 1389.0,50.0 1431.0,16.0 1620.0,16.0 C 1845.0,16.0 1895.0,68.0 2120.0,68.0 C 2246.0,68.0 2274.0,50.0 2400.0,50.0 V 220 H 0 Z"
+            fill="#20BF55"
+          />
+          {/* Luminous Glowing Wave Crest Line */}
+          <path
+            d="M 0,50 C 189.0,50.0 231.0,16.0 420.0,16.0 C 645.0,16.0 695.0,68.0 920.0,68.0 C 1046.0,68.0 1074.0,50.0 1200.0,50.0 C 1389.0,50.0 1431.0,16.0 1620.0,16.0 C 1845.0,16.0 1895.0,68.0 2120.0,68.0 C 2246.0,68.0 2274.0,50.0 2400.0,50.0"
+            fill="none"
+            stroke="#a3ffc2"
+            strokeWidth="3.5"
+            strokeLinecap="round"
+            opacity="0.9"
+          />
+        </svg>
+      </div>
+
+      {/* Floating water bubbles rising from liquid */}
+      <span className="page-header__bubble bubble-1" />
+      <span className="page-header__bubble bubble-2" />
+      <span className="page-header__bubble bubble-3" />
+      <span className="page-header__bubble bubble-4" />
+      <span className="page-header__bubble bubble-5" />
+      <span className="page-header__bubble bubble-6" />
+      <span className="page-header__bubble bubble-7" />
+    </div>
+
+    <div className="container page-header__content">
       <nav aria-label="Breadcrumb" className="crumbs">
         <Link to="/">Home</Link>
         {crumbs.map((c, i) => (
