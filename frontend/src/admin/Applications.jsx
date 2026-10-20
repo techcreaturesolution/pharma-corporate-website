@@ -40,7 +40,7 @@ export default function Applications() {
         { label: 'Experience', render: (a) => a.experience || '—' },
       ]}
       renderDetail={(a) => (
-        <>
+        <dl className="detail-grid">
           {row('Vacancy', a.jobId ? `${a.jobId.title}${a.jobId.location ? ` — ${a.jobId.location}` : ''}` : null)}
           {row('Email', <a href={`mailto:${a.email}`}>{a.email}</a>)}
           {row('Phone', a.phone)}
@@ -49,7 +49,7 @@ export default function Applications() {
           {row('Cover letter', a.coverLetter)}
           {row('Resume', a.resume ? `${a.resume.originalName} (${Math.round((a.resume.size || 0) / 1024)} KB)` : null)}
           {row('Consent', a.consent ? 'Given' : 'Not recorded')}
-        </>
+        </dl>
       )}
       extraActions={(a) => (
         <button type="button" className="btn btn--outline btn--sm" onClick={() => downloadResume(a).catch(() => window.alert('Unable to download resume'))}>
