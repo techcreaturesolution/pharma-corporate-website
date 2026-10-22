@@ -40,6 +40,12 @@ export const env = {
     endpoint: process.env.STORAGE_ENDPOINT,
     publicBaseUrl: process.env.STORAGE_PUBLIC_BASE_URL,
     localDir: process.env.STORAGE_LOCAL_DIR || 'uploads',
+    cloudinary: {
+      cloudName: process.env.CLOUDINARY_CLOUD_NAME,
+      apiKey: process.env.CLOUDINARY_API_KEY,
+      apiSecret: process.env.CLOUDINARY_API_SECRET,
+      folderPrefix: process.env.CLOUDINARY_FOLDER || 'pharma-corporate',
+    },
   },
   maxUploadMb: Number(process.env.MAX_UPLOAD_MB || 10),
   captchaSecret: process.env.CAPTCHA_SECRET_KEY,
