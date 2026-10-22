@@ -21,13 +21,16 @@
 /* ── Admin Flowing Green Liquid Wave Background (with Light Green First Layer) ── */
 .admin__liquid-bg {
   position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 45vh;
+  bottom: -20px;
+  left: -20px;
+  right: -20px;
+  height: calc(45vh + 20px);
   overflow: hidden;
   pointer-events: none;
   z-index: 0;
+  filter: blur(5px);
+  -webkit-filter: blur(5px);
+  transform: translate3d(0, 0, 0);
 }
 
 /* Wave tracks (200% width for infinite seamless looping) */
@@ -348,20 +351,32 @@
 .admin__topbar-right {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.65rem;
   flex-shrink: 0;
 }
 
 .admin__user {
-  display: flex;
-  gap: 0.65rem;
+  display: inline-flex;
   align-items: center;
-  font-size: 0.88rem;
+  gap: 0.65rem;
+  height: 42px;
+  min-height: 42px;
+  box-sizing: border-box;
   background: #ffffff;
-  padding: 0.35rem 0.85rem 0.35rem 0.45rem;
+  padding: 0 0.95rem 0 0.35rem;
   border-radius: 9999px;
-  border: 1px solid rgba(0, 0, 0, 0.06);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: none !important;
+  text-decoration: none !important;
+  color: inherit;
+  transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+  user-select: none;
+}
+
+.admin__user:hover {
+  border-color: rgba(32, 191, 85, 0.5);
+  box-shadow: none !important;
+  transform: translateY(-1px);
 }
 
 .admin__user-avatar {
@@ -375,7 +390,7 @@
   justify-content: center;
   font-weight: 700;
   font-size: 0.85rem;
-  box-shadow: 0 2px 6px rgba(32, 191, 85, 0.3);
+  box-shadow: none !important;
   flex-shrink: 0;
 }
 
@@ -383,18 +398,19 @@
   display: flex;
   flex-direction: column;
   line-height: 1.15;
+  justify-content: center;
 }
 
 .admin__user-name {
   font-weight: 600;
-  color: var(--ink);
-  font-size: 0.85rem;
+  color: #1e293b;
+  font-size: 0.84rem;
   white-space: nowrap;
 }
 
 .admin__user-role {
   color: #105c48;
-  font-size: 0.68rem;
+  font-size: 0.66rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -402,24 +418,66 @@
 
 .admin__topbar-site-btn,
 .admin__topbar-signout-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  white-space: nowrap;
-  font-size: 0.82rem;
-  font-weight: 600;
-  background: #ffffff;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  border-radius: 9999px;
-  padding: 0.45rem 0.95rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
-  transition: all 0.2s ease;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.45rem !important;
+  height: 42px !important;
+  min-height: 42px !important;
+  box-sizing: border-box !important;
+  white-space: nowrap !important;
+  font-size: 0.88rem !important;
+  font-weight: 600 !important;
+  font-family: inherit !important;
+  background: #ffffff !important;
+  color: #374151 !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  border-radius: 9999px !important;
+  padding: 0 1.15rem !important;
+  box-shadow: none !important;
+  filter: none !important;
+  text-decoration: none !important;
+  cursor: pointer !important;
+  outline: none !important;
+  transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
+  line-height: 1 !important;
 }
 
-.admin__topbar-site-btn:hover,
+.admin__topbar-site-btn svg,
+.admin__topbar-signout-btn svg {
+  width: 16px !important;
+  height: 16px !important;
+  flex-shrink: 0 !important;
+  color: #64748b !important;
+  transition: color 0.2s ease, transform 0.2s ease !important;
+}
+
+.admin__topbar-site-btn:hover {
+  border-color: #20BF55 !important;
+  color: #105c48 !important;
+  background: rgba(32, 191, 85, 0.05) !important;
+  box-shadow: none !important;
+  filter: none !important;
+  transform: translateY(-1px) !important;
+}
+
+.admin__topbar-site-btn:hover svg {
+  color: #20BF55 !important;
+  transform: translate(1px, -1px) !important;
+}
+
 .admin__topbar-signout-btn:hover {
-  border-color: #20BF55;
-  color: #105c48;
+  border-color: #ef4444 !important;
+  color: #dc2626 !important;
+  background: rgba(239, 68, 68, 0.05) !important;
+  box-shadow: none !important;
+  filter: none !important;
+  transform: translateY(-1px) !important;
+}
+
+.admin__topbar-signout-btn:hover svg {
+  color: #dc2626 !important;
+  transform: translateX(2px) !important;
 }
 
 /* ── Workspace & Floating Capsule Sidebar ── */
@@ -741,27 +799,32 @@
 .admin__view-switch {
   display: inline-flex;
   align-items: center;
+  height: 42px;
+  box-sizing: border-box;
   background: #ffffff;
   border: 1px solid #e2e8f0;
   border-radius: 9999px;
   padding: 3px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  box-shadow: none !important;
 }
 
 .admin__view-btn {
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
-  padding: 0.42rem 0.95rem;
+  justify-content: center;
+  gap: 0.45rem;
+  height: 100%;
+  padding: 0 1.05rem;
   border-radius: 9999px;
   border: none;
   background: transparent;
   color: #64748b;
-  font-size: 0.82rem;
+  font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
   user-select: none;
+  box-shadow: none !important;
 }
 
 .admin__view-btn:hover:not(.admin__view-btn--active) {
@@ -772,26 +835,32 @@
 .admin__view-btn--active {
   background: #20BF55 !important;
   color: #ffffff !important;
-  box-shadow: 0 2px 6px rgba(32, 191, 85, 0.32);
+  box-shadow: none !important;
+  filter: none !important;
 }
 
 .admin__view-btn--active svg {
   color: #ffffff !important;
 }
 
-/* ── Add New Product / Resource Button ── */
+/* ── Add New Product / Resource Button (Strict Zero Drop Shadow) ── */
 .admin__add-btn {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 0.45rem;
+  height: 42px;
+  min-height: 42px;
+  box-sizing: border-box;
   background: #20BF55;
   color: #ffffff !important;
   font-weight: 600;
   font-size: 0.88rem;
-  padding: 0.6rem 1.35rem;
+  padding: 0 1.35rem;
   border-radius: 9999px;
   text-decoration: none !important;
-  box-shadow: 0 4px 14px rgba(32, 191, 85, 0.35);
+  box-shadow: none !important;
+  filter: none !important;
   transition: all 0.22s ease;
   white-space: nowrap;
 }
@@ -799,11 +868,39 @@
 .admin__add-btn:hover {
   background: #199e45;
   transform: translateY(-1px);
-  box-shadow: 0 6px 18px rgba(32, 191, 85, 0.45);
+  box-shadow: none !important;
+  filter: none !important;
 }
 
 .admin__add-btn svg {
   color: #ffffff !important;
+}
+
+/* ── Strict Zero Drop-Shadow on Action Buttons Across Admin ── */
+.admin-action-btn,
+.admin__body button,
+.admin__body .btn,
+.admin__body .icon-btn,
+.admin__body .btn--primary,
+.admin__body .btn--outline,
+.admin__body .btn--danger,
+.admin__top-actions button,
+.admin__top-actions a {
+  box-shadow: none !important;
+  filter: none !important;
+}
+
+.admin-action-btn:hover,
+.admin__body button:hover,
+.admin__body .btn:hover,
+.admin__body .icon-btn:hover,
+.admin__body .btn--primary:hover,
+.admin__body .btn--outline:hover,
+.admin__body .btn--danger:hover,
+.admin__top-actions button:hover,
+.admin__top-actions a:hover {
+  box-shadow: none !important;
+  filter: none !important;
 }
 
 /* ── Filter Toolbar Enhancements ── */

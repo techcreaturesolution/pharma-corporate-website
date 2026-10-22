@@ -498,7 +498,7 @@ function Shell({ children }) {
 
         {/* Right user info & quick actions */}
         <div className="admin__topbar-right">
-          <div className="admin__user">
+          <Link to="/admin/profile" className="admin__user" title="My profile">
             <div className="admin__user-avatar" title={user.name}>
               {user.name ? user.name.charAt(0).toUpperCase() : 'A'}
             </div>
@@ -506,24 +506,24 @@ function Shell({ children }) {
               <span className="admin__user-name">{user.name}</span>
               <span className="admin__user-role">{user.role}</span>
             </div>
-          </div>
+          </Link>
           <a
             href="/"
             target="_blank"
             rel="noreferrer"
-            className="btn btn--outline btn--sm admin__topbar-site-btn"
+            className="admin__topbar-site-btn"
             title="Open website in new tab"
           >
-            <Icon name="globe" style={{ width: 14, height: 14 }} />
+            <Icon name="globe" style={{ width: 16, height: 16 }} />
             <span>Site ↗</span>
           </a>
           <button
             type="button"
-            className="btn btn--outline btn--sm admin__topbar-signout-btn"
+            className="admin__topbar-signout-btn"
             onClick={handleSignOut}
             title="Sign out"
           >
-            <Icon name="logout" style={{ width: 14, height: 14 }} />
+            <Icon name="logout" style={{ width: 16, height: 16 }} />
             <span>Sign out</span>
           </button>
         </div>
