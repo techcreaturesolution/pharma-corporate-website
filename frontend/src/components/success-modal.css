@@ -1,0 +1,521 @@
+/* ==========================================================================
+   Professional Corporate Success Modal with Animated Tick Mark
+   ========================================================================== */
+
+.success-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem;
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  animation: successModalFadeIn 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.success-modal-overlay.is-closing {
+  animation: successModalFadeOut 0.2s ease-in forwards;
+}
+
+@keyframes successModalFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes successModalFadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+/* Modal Dialog Card */
+.success-modal-card {
+  position: relative;
+  width: 100%;
+  max-width: 490px;
+  background: #ffffff;
+  border-radius: 20px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 
+    0 24px 50px -12px rgba(15, 23, 42, 0.22),
+    0 4px 16px -2px rgba(15, 23, 42, 0.08);
+  overflow: hidden;
+  text-align: center;
+  animation: successModalPopIn 0.38s cubic-bezier(0.34, 1.4, 0.64, 1) forwards;
+  will-change: transform, opacity;
+}
+
+.success-modal-overlay.is-closing .success-modal-card {
+  animation: successModalPopOut 0.18s cubic-bezier(0.4, 0, 1, 1) forwards;
+}
+
+@keyframes successModalPopIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.88) translateY(18px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes successModalPopOut {
+  0% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.92) translateY(10px);
+  }
+}
+
+/* ==========================================================================
+   TOP HEADER BAR WITH SITE LOGO & CLOSE BUTTON
+   ========================================================================== */
+
+.success-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.35rem;
+  background: #fbfcfd;
+  border-bottom: 1px solid #edf2f7;
+}
+
+.success-modal-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  text-align: left;
+}
+
+.success-modal-brand-logo {
+  max-height: 34px;
+  max-width: 130px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  display: block;
+}
+
+.success-modal-brand-mark {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: #105c48;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  font-weight: 700;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.success-modal-brand-info {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+}
+
+.success-modal-brand-title {
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: #093c54;
+  letter-spacing: -0.01em;
+}
+
+.success-modal-brand-sub {
+  font-size: 0.72rem;
+  color: #64748b;
+  font-weight: 500;
+  margin-top: 1px;
+}
+
+/* Close Icon Button */
+.success-modal-close-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.success-modal-close-btn:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+  border-color: #cbd5e1;
+}
+
+.success-modal-close-btn:focus-visible {
+  outline: 2px solid #20bf55;
+  outline-offset: 2px;
+}
+
+.success-modal-close-btn .icon {
+  width: 15px;
+  height: 15px;
+}
+
+/* ==========================================================================
+   MODAL BODY & PROFESSIONAL ANIMATED TICK MARK
+   ========================================================================== */
+
+.success-modal-body {
+  padding: 1.6rem 1.6rem 1.6rem;
+}
+
+.success-modal-icon-wrapper {
+  position: relative;
+  width: 78px;
+  height: 78px;
+  margin: 0 auto 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Subtle single ripple halo */
+.success-modal-ripple {
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  background: rgba(32, 191, 85, 0.16);
+  pointer-events: none;
+  animation: successPulseHalo 2.2s cubic-bezier(0.16, 0.8, 0.3, 1) infinite;
+}
+
+@keyframes successPulseHalo {
+  0% {
+    transform: scale(0.9);
+    opacity: 0.8;
+  }
+  60% {
+    opacity: 0.25;
+  }
+  100% {
+    transform: scale(1.4);
+    opacity: 0;
+  }
+}
+
+/* Disc Container */
+.success-modal-icon-disc {
+  position: relative;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #f0fdf4 0%, #dcfce7 100%);
+  border: 2px solid #86efac;
+  box-shadow: 
+    0 8px 20px -3px rgba(34, 197, 94, 0.25),
+    0 0 0 4px rgba(34, 197, 94, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+  animation: successDiscPop 0.5s cubic-bezier(0.34, 1.45, 0.64, 1) forwards;
+}
+
+@keyframes successDiscPop {
+  0% {
+    transform: scale(0.2);
+    opacity: 0;
+  }
+  70% {
+    transform: scale(1.08);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* The SVG Tick Mark */
+.success-checkmark-svg {
+  width: 48px;
+  height: 48px;
+  display: block;
+}
+
+/* SVG Circle path animation */
+.success-circle-path {
+  stroke: #22c55e;
+  stroke-width: 3.2;
+  stroke-linecap: round;
+  fill: none;
+  stroke-dasharray: 150;
+  stroke-dashoffset: 150;
+  animation: successDrawCircle 0.5s cubic-bezier(0.65, 0, 0.45, 1) 0.15s forwards;
+}
+
+@keyframes successDrawCircle {
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* SVG Check path animation (crisp, bold, medical green) */
+.success-check-path {
+  stroke: #16a34a;
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
+  stroke-dasharray: 45;
+  stroke-dashoffset: 45;
+  animation: successDrawCheck 0.38s cubic-bezier(0.65, 0, 0.45, 1) 0.45s forwards;
+}
+
+@keyframes successDrawCheck {
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* ==========================================================================
+   CONTENT & TYPOGRAPHY
+   ========================================================================== */
+
+.success-modal-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.24rem 0.72rem;
+  border-radius: 9999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: #ecfdf5;
+  color: #15803d;
+  border: 1px solid #bbf2ce;
+  margin-bottom: 0.6rem;
+  animation: successFadeUp 0.35s ease 0.3s both;
+}
+
+.success-modal-badge .icon {
+  width: 12px;
+  height: 12px;
+}
+
+.success-modal-title {
+  font-size: 1.38rem;
+  font-weight: 800;
+  color: #0f172a;
+  line-height: 1.25;
+  margin: 0 0 0.45rem;
+  letter-spacing: -0.015em;
+  animation: successFadeUp 0.35s ease 0.35s both;
+}
+
+.success-modal-desc {
+  font-size: 0.92rem;
+  color: #475569;
+  line-height: 1.5;
+  margin: 0 0 1.15rem;
+  animation: successFadeUp 0.35s ease 0.4s both;
+}
+
+.success-modal-desc strong {
+  color: #0f172a;
+  font-weight: 600;
+}
+
+/* Details Summary Card */
+.success-modal-summary {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 0.85rem 1.1rem;
+  margin-bottom: 1.15rem;
+  text-align: left;
+  animation: successFadeUp 0.35s ease 0.45s both;
+}
+
+.success-modal-summary-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.35rem 0;
+  font-size: 0.85rem;
+  border-bottom: 1px dashed #e2e8f0;
+}
+
+.success-modal-summary-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.success-modal-summary-row:first-child {
+  padding-top: 0;
+}
+
+.success-modal-summary-label {
+  color: #64748b;
+  font-weight: 500;
+  font-size: 0.82rem;
+  flex-shrink: 0;
+}
+
+.success-modal-summary-val {
+  color: #0f172a;
+  font-weight: 600;
+  text-align: right;
+  word-break: break-word;
+}
+
+.success-modal-summary-val--highlight {
+  color: #15803d;
+  font-family: monospace;
+  font-size: 0.82rem;
+  background: #ecfdf5;
+  padding: 0.12rem 0.45rem;
+  border-radius: 5px;
+  border: 1px solid #bbf2ce;
+}
+
+/* Helpful Notice Box */
+.success-modal-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+  background: #f0fdf4;
+  border: 1px solid #dcfce7;
+  border-radius: 10px;
+  padding: 0.7rem 0.85rem;
+  margin-bottom: 1.35rem;
+  font-size: 0.81rem;
+  color: #166534;
+  line-height: 1.45;
+  text-align: left;
+  animation: successFadeUp 0.35s ease 0.5s both;
+}
+
+.success-modal-notice .icon {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: #22c55e;
+}
+
+/* Modal Actions */
+.success-modal-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  animation: successFadeUp 0.35s ease 0.55s both;
+}
+
+.success-modal-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 0.65rem 1.25rem;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none !important;
+  flex: 1 1 0;
+  height: 42px;
+  box-sizing: border-box;
+}
+
+.success-modal-btn--primary {
+  background: #105c48;
+  color: #ffffff;
+  border: none;
+  box-shadow: 0 4px 12px rgba(16, 92, 72, 0.25);
+}
+
+.success-modal-btn--primary:hover {
+  background: #0d4a3a;
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(16, 92, 72, 0.35);
+}
+
+.success-modal-btn--secondary {
+  background: #f8fafc;
+  color: #334155;
+  border: 1px solid #cbd5e1;
+}
+
+.success-modal-btn--secondary:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+  border-color: #94a3b8;
+}
+
+.success-modal-btn .icon {
+  width: 15px;
+  height: 15px;
+  transition: transform 0.2s ease;
+}
+
+.success-modal-btn--primary:hover .icon {
+  transform: translateX(2px);
+}
+
+@keyframes successFadeUp {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Mobile responsive */
+@media (max-width: 480px) {
+  .success-modal-card {
+    border-radius: 16px;
+  }
+  .success-modal-header {
+    padding: 0.85rem 1.1rem;
+  }
+  .success-modal-body {
+    padding: 1.25rem 1.1rem 1.25rem;
+  }
+  .success-modal-title {
+    font-size: 1.25rem;
+  }
+  .success-modal-actions {
+    flex-direction: column-reverse;
+  }
+  .success-modal-btn {
+    width: 100%;
+    flex: 1 1 auto;
+  }
+}

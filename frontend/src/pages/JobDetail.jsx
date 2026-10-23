@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import Seo from '../components/Seo.jsx';
 import { Loader, ErrorState, PageHeader, RichHtml, Field, Alert } from '../components/ui.jsx';
+import SuccessModal from '../components/SuccessModal.jsx';
 import { useApi, formatDate } from '../lib/hooks.js';
 import { post, parseError } from '../lib/api.js';
 import NotFound from './NotFound.jsx';
@@ -15,6 +16,28 @@ export default function JobDetail() {
   const [file, setFile] = useState(null);
   const [errors, setErrors] = useState({});
   const [status, setStatus] = useState({ loading: false, success: null, error: null });
+  const [successData, setSuccessData] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const sp = new URLSearchParams(window.location.search);
+      if (sp.has('preview_success')) {
+        return {
+          applicantName: 'Dr. Priya Mehta',
+          email: 'priya.mehta@example.com',
+          jobTitle: 'Senior Regulatory Affairs Specialist',
+          department: 'Regulatory Compliance & QA',
+          referenceId: '66fa3b82',
+        };
+      }
+    }
+    return null;
+  });
+
+  useEffect(() => {
+    if (!isLoading && window.location.hash === '#apply') {
+      const el = document.getElementById('apply');
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [slug, isLoading]);
 
   if (isLoading) return <Loader full />;
   if (isError) return error?.response?.status === 404 ? <NotFound /> : <ErrorState error={error} />;
@@ -32,8 +55,18 @@ export default function JobDetail() {
     Object.entries(form).forEach(([k, v]) => v !== '' && fd.append(k, v));
     fd.append('resume', file);
     try {
+      const applicantName = form.name;
+      const applicantEmail = form.email;
       const res = await post(`/careers/${job._id}/applications`, fd, { headers: { 'Content-Type': 'multipart/form-data' } });
       setStatus({ loading: false, success: res.message, error: null });
+      setSuccessData({
+        applicantName,
+        email: applicantEmail,
+        jobTitle: job.title,
+        department: job.department,
+        referenceId: res.data?.applicationId,
+        message: res.message || 'Your application has been received successfully!',
+      });
       setForm(initial);
       setFile(null);
       e.target.reset();
@@ -138,6 +171,21 @@ export default function JobDetail() {
           </div>
         </div>
       </section>
+      <SuccessModal
+        isOpen={Boolean(successData)}
+        onClose={() => setSuccessData(null)}
+        data={successData}
+        title="Application Submitted Successfully!"
+        badge="Application Received"
+        primaryAction={{
+          label: 'Explore More Vacancies',
+          to: '/careers',
+        }}
+        secondaryAction={{
+          label: 'Done',
+          onClick: () => setSuccessData(null),
+        }}
+      />
     </>
   );
 }

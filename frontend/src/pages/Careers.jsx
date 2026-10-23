@@ -193,7 +193,7 @@ export default function Careers() {
                       <span className="job-card__foot-meta">
                         {j.employmentType || 'Full-time'}
                       </span>
-                      <Link to={`/careers/${j.slug}`} className="job-card__cta">
+                      <Link to={`/careers/${j.slug}#apply`} className="job-card__cta">
                         <span>View & Apply</span>
                         <Icon name="arrow" />
                       </Link>

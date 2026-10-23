@@ -101,8 +101,8 @@ function SlidingTabsNav({ sections, activeSectionId, onSelectSection }) {
   const rubberTransition = pillStyle.isInitial
     ? 'none'
     : pillStyle.direction === 'right'
-    ? 'right 0.36s cubic-bezier(0.2, 0.9, 0.3, 1) 0s, left 0.42s cubic-bezier(0.25, 1.32, 0.35, 1) 0.08s, height 0.25s ease'
-    : 'left 0.36s cubic-bezier(0.2, 0.9, 0.3, 1) 0s, right 0.42s cubic-bezier(0.25, 1.32, 0.35, 1) 0.08s, height 0.25s ease';
+    ? 'right 0.36s cubic-bezier(0.2, 0.9, 0.3, 1) 0s, left 0.42s cubic-bezier(0.25, 1.32, 0.35, 1) 0.08s, top 0.28s cubic-bezier(0.2, 0.8, 0.2, 1), height 0.25s ease'
+    : 'left 0.36s cubic-bezier(0.2, 0.9, 0.3, 1) 0s, right 0.42s cubic-bezier(0.25, 1.32, 0.35, 1) 0.08s, top 0.28s cubic-bezier(0.2, 0.8, 0.2, 1), height 0.25s ease';
 
   return (
     <nav className="admin-sliding-nav" ref={containerRef} aria-label="Main Admin Navigation">
@@ -145,7 +145,7 @@ function SlidingTabsNav({ sections, activeSectionId, onSelectSection }) {
  * Dynamically updates its sub-links based on the active top navbar category
  * with a vertical sliding stretchy rubber-band circle/capsule behind the active icon.
  */
-function CapsuleSidebar({ activeSection, location, close, logout, isExpanded }) {
+function CapsuleSidebar({ activeSection, location, close, logout, isExpanded, sections, onSelectSection, isMobile, user }) {
   const subLinks = activeSection?.subLinks || [];
   const groupRef = useRef(null);
   const linkRefs = useRef({});
@@ -236,13 +236,59 @@ function CapsuleSidebar({ activeSection, location, close, logout, isExpanded }) 
     : 'top 0.36s cubic-bezier(0.2, 0.9, 0.3, 1) 0s, bottom 0.42s cubic-bezier(0.25, 1.32, 0.35, 1) 0.08s';
 
   return (
-    <aside className={`admin-capsule-aside ${isExpanded ? 'admin-capsule-aside--expanded' : ''}`}>
+    <aside className={`admin-capsule-aside ${isExpanded ? 'admin-capsule-aside--expanded' : ''} ${isMobile ? 'admin-capsule-aside--mobile' : ''}`}>
       <div
-        className={`admin-capsule ${isExpanded ? 'admin-capsule--expanded' : ''}`}
-        style={capsuleHeight ? { height: `${capsuleHeight}px` } : undefined}
+        className={`admin-capsule ${isExpanded ? 'admin-capsule--expanded' : ''} ${isMobile ? 'admin-capsule--mobile' : ''}`}
+        style={capsuleHeight && !isMobile ? { height: `${capsuleHeight}px` } : undefined}
       >
         <div ref={innerRef} className="admin-capsule__inner">
-          {/* Dynamic sublinks inside the #20BF55 capsule with vertical sliding stretchy pill */}
+          {/* Mobile Drawer Header with User Info & Close button */}
+          {isMobile && (
+            <div className="admin-capsule__mobile-header">
+              <div className="admin-capsule__mobile-user">
+                <div className="admin-capsule__mobile-avatar">
+                  {user?.name ? user.name.charAt(0).toUpperCase() : 'A'}
+                </div>
+                <div className="admin-capsule__mobile-user-info">
+                  <span className="admin-capsule__mobile-name">{user?.name || 'Site Admin'}</span>
+                  <span className="admin-capsule__mobile-role">{user?.role || 'Administrator'}</span>
+                </div>
+              </div>
+              <button
+                type="button"
+                className="admin-capsule__mobile-close"
+                onClick={close}
+                aria-label="Close navigation menu"
+              >
+                <Icon name="close" />
+              </button>
+            </div>
+          )}
+
+          {/* Mobile Navigation Sections Switcher */}
+          {isMobile && sections && sections.length > 0 && (
+            <div className="admin-capsule__mobile-sections">
+              <span className="admin-capsule__mobile-section-heading">Sections</span>
+              <div className="admin-capsule__mobile-section-chips">
+                {sections.map((sec) => {
+                  const isActive = sec.id === activeSection?.id;
+                  return (
+                    <button
+                      key={sec.id}
+                      type="button"
+                      className={`admin-capsule__mobile-sec-btn ${isActive ? 'admin-capsule__mobile-sec-btn--active' : ''}`}
+                      onClick={() => onSelectSection?.(sec)}
+                    >
+                      {sec.icon && <Icon name={sec.icon} />}
+                      <span>{sec.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Dynamic sublinks inside the capsule with vertical sliding stretchy pill */}
           <div ref={groupRef} className="admin-capsule__group">
             <span
               className="admin-capsule__pill"
@@ -527,6 +573,35 @@ function Shell({ children }) {
             <span>Sign out</span>
           </button>
         </div>
+
+        {/* Secondary Sub-Navbar (Responsive): Dynamic Sub-links for the active section */}
+        {activeSection?.subLinks && activeSection.subLinks.length > 0 && (
+          <div className="admin__subbar" aria-label={`${activeSection.label} sub-navigation`}>
+            <div className="admin__subbar-inner">
+              <span className="admin__subbar-badge">
+                {activeSection.icon && <Icon name={activeSection.icon} style={{ width: 13, height: 13 }} />}
+                <span>{activeSection.label}</span>
+              </span>
+              <div className="admin__subbar-links">
+                {activeSection.subLinks.map((item) => {
+                  const isActive = item.exact
+                    ? location.pathname === item.path || location.pathname === `${item.path}/`
+                    : location.pathname.startsWith(item.path);
+                  return (
+                    <NavLink
+                      key={item.path}
+                      to={item.path}
+                      className={`admin__subbar-link ${isActive ? 'admin__subbar-link--active' : ''}`}
+                    >
+                      {item.icon && <Icon name={item.icon} style={{ width: 14, height: 14 }} />}
+                      <span>{item.label}</span>
+                    </NavLink>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        )}
       </header>
 
       {/* Workspace Area: Left Capsule Sidebar + Main Body */}
@@ -544,7 +619,13 @@ function Shell({ children }) {
             location={location}
             close={closeMobile}
             logout={handleSignOut}
-            isExpanded={sidebarExpanded}
+            isExpanded={sidebarExpanded || mobileMenuOpen}
+            sections={availableSections}
+            onSelectSection={(sec) => {
+              handleSelectSection(sec);
+            }}
+            isMobile={mobileMenuOpen}
+            user={user}
           />
         </div>
         <main className="admin__body">
